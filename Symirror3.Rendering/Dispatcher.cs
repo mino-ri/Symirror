@@ -18,12 +18,12 @@ namespace Symirror3.Rendering
 
         private readonly Graphics _graphics;
         private readonly LinkedList<IFrameTask> _frameTasks = new();
-        private readonly ConcurrentQueue<IMessage?> _messageQueue = new();
+        private readonly ConcurrentQueue<IMessage> _messageQueue = new();
+        private readonly object _lockObj = new object();
         private int _bufferFrames;
         private bool _stopRequested;
         private Task? _renderLoop;
         private int _rotateCount;
-        private readonly object _lockObj = new object();
 
         private PolyhedronSelector<Vector3> _polyhedronSelector;
         private PolyhedronBase<Vector3> _polyhedron;
@@ -42,7 +42,7 @@ namespace Symirror3.Rendering
             _renderer.OnActivate(_graphics);
         }
 
-        public void SendMessage(IMessage? message)
+        public void SendMessage(IMessage message)
         {
             _messageQueue.Enqueue(message);
             lock (_lockObj)
@@ -109,125 +109,132 @@ namespace Symirror3.Rendering
             }
         }
 
-        private void HandleMessage(IMessage? message)
+        private void HandleMessage(IMessage message)
         {
-            switch (message)
-            {
-                case ChangeLight msg:
-                    _renderer.LightFactor = msg.Light;
-                    _renderer.ShadowFactor = msg.Shadow;
-                    break;
-                case MoveBasePoint msg:
-                    HandleMoveBasePoint(msg);
-                    break;
-                case MoveBasePointTo msg:
-                    HandleMoveBasePointTo(msg);
-                    break;
-                case Rotate msg:
-                    HandleRotate(msg);
-                    break;
-                case ChangeAutoRotation msg:
-                    HandleAutoRotation(msg);
-                    break;
-                case ResetRotation msg:
-                    _graphics.SetWorld(in Matrix4.Identity);
-                    _rotateCount = 0;
-                    break;
-                case ChangeSymbol msg:
-                    _polyhedronSelector.Symbol = msg.Symbol;
-                    _polyhedron = _polyhedronSelector.GetPolyhedron(msg.PolyhedronType);
-                    break;
-                case ChangePolyhedronType msg:
-                    _polyhedron = _polyhedronSelector.GetPolyhedron(msg.PolyhedronType);
-                    break;
-                case ChangeFaceVisible msg:
-                    _filter.HandleMessage(msg);
-                    break;
-                case ChangeFaceViewType msg:
-                    _filter.HandleMessage(msg);
-                    break;
-                case ChangeFaceRenderType msg:
-                    var (light, shadow) = (_renderer.LightFactor, _renderer.ShadowFactor);
-                    _renderer = msg.FaceRenderType switch
-                    {
-                        FaceRenderType.Holed => new HoledPolygonRenderer(),
-                        _ => new StandardPolygonRenderer(),
-                    }; 
-                    _renderer.LightFactor = light;
-                    _renderer.ShadowFactor = shadow;
-                    _renderer.OnActivate(_graphics);
-                    break;
-                default:
-                    StartTask(message!, _ => true);
-                    break;
-            }
+            HandleMessageCore((dynamic)message);
+        }
 
-            void HandleMoveBasePoint(MoveBasePoint msg)
-            {
-                var p = _polyhedron.BasePoint;
-                if (msg.RotateX != 0f)
-                {
-                    var sin = MathF.Sin(msg.RotateX * MoveDelta);
-                    var cos = MathF.Cos(msg.RotateX * MoveDelta);
-                    (p.X, p.Z) = (p.X * cos - p.Z * sin, p.Z * cos + p.X * sin);
-                }
-                if (msg.RotateY != 0f)
-                {
-                    var sin = MathF.Sin(msg.RotateY * -MoveDelta);
-                    var cos = MathF.Cos(msg.RotateY * -MoveDelta);
-                    (p.Y, p.Z) = (p.Y * cos - p.Z * sin, p.Z * cos + p.Y * sin);
-                }
-                _polyhedron.BasePoint = p;
-            }
+        #region HandleMessageCore
 
-            void HandleMoveBasePointTo(MoveBasePointTo msg)
+        private void HandleMessageCore(ChangeLight msg)
+        {
+            _renderer.LightFactor = msg.Light;
+            _renderer.ShadowFactor = msg.Shadow;
+        }
+
+        private void HandleMessageCore(MoveBasePoint msg)
+        {
+            var p = _polyhedron.BasePoint;
+            if (msg.RotateX != 0f)
             {
-                if (HasTask<MoveBasePointFromTo>()) return;
-                var distance = MathF.Acos(Math.Clamp(Vector3.Dot(_polyhedron.BasePoint, msg.To), -1f, 1f));
-                var baseCount = Math.Max(40, (int)(distance / Math.PI * 180));
-                StartCountTask(new MoveBasePointFromTo(_polyhedron.BasePoint, msg.To, baseCount), baseCount, (m, count) =>
+                var sin = MathF.Sin(msg.RotateX * MoveDelta);
+                var cos = MathF.Cos(msg.RotateX * MoveDelta);
+                (p.X, p.Z) = (p.X * cos - p.Z * sin, p.Z * cos + p.X * sin);
+            }
+            if (msg.RotateY != 0f)
+            {
+                var sin = MathF.Sin(msg.RotateY * -MoveDelta);
+                var cos = MathF.Cos(msg.RotateY * -MoveDelta);
+                (p.Y, p.Z) = (p.Y * cos - p.Z * sin, p.Z * cos + p.Y * sin);
+            }
+            _polyhedron.BasePoint = p;
+        }
+
+        private void HandleMessageCore(MoveBasePointTo msg)
+        {
+            if (HasTask<MoveBasePointFromTo>()) return;
+            var distance = MathF.Acos(Math.Clamp(Vector3.Dot(_polyhedron.BasePoint, msg.To), -1f, 1f));
+            if (distance <= MathF.PI / 180f)
+            {
+                _polyhedron.BasePoint = msg.To;
+                return;
+            }
+            var frameCount = Math.Max(40, (int)(distance / Math.PI * 180));
+            HandleMessageCore(new MoveBasePointFromTo(_polyhedron.BasePoint, msg.To, frameCount));
+        }
+
+        private void HandleMessageCore(MoveBasePointFromTo msg)
+        {
+            if (HasTask<MoveBasePointFromTo>()) return;
+            StartCountTask(msg, msg.FrameCount, (m, count) =>
+            {
+                _polyhedron.BasePoint = Sphere.Lerp(Vector3Operator.Instance, m.To, m.From, (double)count / m.FrameCount);
+            });
+        }
+
+        private void HandleMessageCore(Rotate msg)
+        {
+            if (msg.RotateX != 0f)
+                _graphics.World *= Matrix4.RotationY(msg.RotateX * RotationDelta);
+            if (msg.RotateY != 0f)
+                _graphics.World *= Matrix4.RotationX(msg.RotateY * -RotationDelta);
+            if (msg.RotateZ != 0f)
+                _graphics.World *= Matrix4.RotationZ(msg.RotateZ * RotationDelta);
+            _graphics.FlushWorld();
+        }
+
+        private void HandleMessageCore(ChangeAutoRotation msg)
+        {
+            var hasTask = HasTask<ChangeAutoRotation>();
+            if (msg.AutoRotation && !hasTask)
+            {
+                StartTask(msg, m =>
                 {
-                    _polyhedron.BasePoint = Sphere.Lerp(Vector3Operator.Instance, m.To, m.From, (double)count / m.FrameCount);
+                    _rotateCount = (_rotateCount + 1) & 1023;
+                    _graphics.SetWorld(Matrix4.RotationX((float)Math.PI / 512f * _rotateCount) *
+                                        Matrix4.RotationY((float)Math.PI / 512f * _rotateCount));
+                    return false;
                 });
             }
-
-            void HandleRotate(Rotate msg)
+            else if (!msg.AutoRotation && hasTask)
             {
-                if (msg.RotateX != 0f)
-                    _graphics.World *= Matrix4.RotationY(msg.RotateX * RotationDelta);
-                if (msg.RotateY != 0f)
-                    _graphics.World *= Matrix4.RotationX(msg.RotateY * -RotationDelta);
-                if (msg.RotateZ != 0f)
-                    _graphics.World *= Matrix4.RotationZ(msg.RotateZ * RotationDelta);
-                _graphics.FlushWorld();
-            }
-
-            void HandleAutoRotation(ChangeAutoRotation msg)
-            {
-                var hasTask = HasTask<ChangeAutoRotation>();
-                if (msg.AutoRotation && !hasTask)
+                for (var node = _frameTasks.First; node is { }; node = node.Next)
                 {
-                    StartTask(msg, m =>
+                    if (node.Value.Message is ChangeAutoRotation)
                     {
-                        _rotateCount = (_rotateCount + 1) & 1023;
-                        _graphics.SetWorld(Matrix4.RotationX((float)Math.PI / 512f * _rotateCount) *
-                                           Matrix4.RotationY((float)Math.PI / 512f * _rotateCount));
-                        return false;
-                    });
-                }
-                else if (!msg.AutoRotation && hasTask)
-                {
-                    for (var node = _frameTasks.First; node is { }; node = node.Next)
-                    {
-                        if (node.Value.Message is ChangeAutoRotation)
-                        {
-                            _frameTasks.Remove(node);
-                            break;
-                        }
+                        _frameTasks.Remove(node);
+                        break;
                     }
                 }
             }
         }
+
+        private void HandleMessageCore(ResetRotation msg)
+        {
+            _graphics.SetWorld(in Matrix4.Identity);
+            _rotateCount = 0;
+        }
+
+        private void HandleMessageCore(ChangeSymbol msg)
+        {
+            _polyhedronSelector.Symbol = msg.Symbol;
+            HandleMessageCore(new ChangePolyhedronType(msg.PolyhedronType));
+        }
+
+        private void HandleMessageCore(ChangePolyhedronType msg) => _polyhedron = _polyhedronSelector.GetPolyhedron(msg.PolyhedronType);
+
+        private void HandleMessageCore(ChangeFaceVisible msg) => _filter.HandleMessage(msg);
+
+        private void HandleMessageCore(ChangeFaceViewType msg) => _filter.HandleMessage(msg);
+
+        private void HandleMessageCore(ChangeFaceRenderType msg)
+        {
+            var (light, shadow) = (_renderer.LightFactor, _renderer.ShadowFactor);
+            _renderer = msg.FaceRenderType switch
+            {
+                FaceRenderType.Holed => new HoledPolygonRenderer(),
+                _ => new StandardPolygonRenderer(),
+            };
+            _renderer.LightFactor = light;
+            _renderer.ShadowFactor = shadow;
+            _renderer.OnActivate(_graphics);
+        }
+
+        private void HandleMessageCore(IMessage message)
+        {
+            System.Diagnostics.Debug.Print($"Unhandled message: {message?.GetType().Name ?? "[null]"}");
+        }
+#endregion
 
         private bool HasTask<T>() where T : IMessage => _frameTasks.Any(t => t.Message is T);
 

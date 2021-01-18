@@ -27,7 +27,12 @@ namespace Symirror3
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            ((ViewModel)DataContext).Dispose();
+            viewModel.Dispose();
+        }
+
+        private void Window_Activated(object sender, EventArgs e)
+        {
+            viewModel?.Rotate(0f, 0f, 0f);
         }
 
         int _oldX, _oldY;

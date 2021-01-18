@@ -4,7 +4,7 @@ namespace Symirror3.Rendering
 {
     internal interface IFrameTask
     {
-        IMessage? Message { get; }
+        IMessage Message { get; }
         bool Invoke();
     }
 
@@ -15,7 +15,7 @@ namespace Symirror3.Rendering
 
         public T Message { get; }
 
-        IMessage? IFrameTask.Message => Message;
+        IMessage IFrameTask.Message => Message;
 
         internal FrameTask(T message, Func<T, bool> action) => (Message, _action) = (message, action);
 
@@ -29,7 +29,7 @@ namespace Symirror3.Rendering
         private int _count;
         public T Message { get; }
 
-        IMessage? IFrameTask.Message => Message;
+        IMessage IFrameTask.Message => Message;
 
         internal CountFrameTask(T message, int count, Action<T, int> action) =>
             (Message, _count, _action) = (message, count, action);

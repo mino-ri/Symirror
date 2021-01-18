@@ -13,7 +13,8 @@
         Title="Symirror3"
         d:DataContext="{d:DesignData Type={x:Type local:ViewModel}}"
         ContentRendered="Window_ContentRendered"
-        Closing="Window_Closing">
+        Closing="Window_Closing"
+        Activated="Window_Activated">
     <DockPanel>
         <WindowsFormsHost Width="512" Height="512" DockPanel.Dock="Left" Background="Black"
                           Cursor="SizeAll">
