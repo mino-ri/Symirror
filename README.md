@@ -1,0 +1,2 @@
+# Symirror
+Wythoff construction visualizer
