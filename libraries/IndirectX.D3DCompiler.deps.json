@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "IndirectX.D3DCompiler/1.0.0": {
+        "dependencies": {
+          "IndirectX": "1.0.0"
+        },
+        "runtime": {
+          "IndirectX.D3DCompiler.dll": {}
+        }
+      },
+      "IndirectX/1.0.0": {
+        "runtime": {
+          "IndirectX.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "IndirectX.D3DCompiler/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "IndirectX/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

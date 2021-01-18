@@ -1,0 +1,45 @@
+﻿using System.Numerics;
+using Symirror3.Core.Polyhedrons;
+using Symirror3.Core.Symmetry;
+
+namespace Symirror3.Rendering
+{
+    public interface IMessage { }
+
+    public record ChangeLight(int Light, int Shadow) : IMessage;
+
+    public record MoveBasePoint(float RotateX, float RotateY) : IMessage;
+
+    public record MoveBasePointTo(Vector3 To) : IMessage;
+
+    public record MoveBasePointFromTo(Vector3 From, Vector3 To, int FrameCount) : IMessage;
+
+    public record Rotate(float RotateX, float RotateY, float RotateZ) : IMessage;
+
+    public record ChangeAutoRotation(bool AutoRotation) : IMessage;
+
+    public record ResetRotation() : IMessage;
+
+    public record ChangeSymbol(SymmetrySymbol Symbol, SolidType SolidType) : IMessage;
+
+    public record ChangeSolidType(SolidType SolidType) : IMessage;
+
+    public record ChangeFaceVisible(bool[] FaceVisibles) : IMessage;
+
+    public record ChangeFaceViewType(FaceViewType FaceViewType) : IMessage;
+
+    public record ChangeFaceRenderType(FaceRenderType FaceRenderType) : IMessage;
+
+    public enum FaceViewType
+    {
+        全て表示,
+        各1枚のみ,
+        頂点形状
+    }
+
+    public enum FaceRenderType
+    {
+        通常,
+        穴あき,
+    }
+}
