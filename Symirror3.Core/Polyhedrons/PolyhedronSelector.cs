@@ -20,32 +20,32 @@ namespace Symirror3.Core.Polyhedrons
             Symmetry = new Symmetry<T>(symbol, _opr);
         }
 
-        public PolyhedronBase<T> GetPolyhedron(SolidType solidType)
+        public PolyhedronBase<T> GetPolyhedron(PolyhedronType polyhedronType)
         {
-            return solidType switch
+            return polyhedronType switch
             {
-                SolidType.球面三角形 => new SymmetrySourcePolyhedron<T>(Symmetry, _opr),
-                SolidType.通常 => new NormalPolyhedron<T>(Symmetry, _opr),
-                SolidType.変形 => new SnubPolyhedron<T>(Symmetry, _opr),
-                SolidType.半対称1 => new IonicPolyhedron1<T>(Symmetry, _opr),
-                SolidType.半対称2 => new IonicPolyhedron2<T>(Symmetry, _opr),
-                SolidType.二重斜方 => new DirhombicPolyhedron<T>(Symmetry, _opr),
-                SolidType.双対 => new DualPolyhedron<T>(Symmetry, _opr),
-                SolidType.変形双対 => new SnubDualPolyhedron<T>(Symmetry, _opr),
+                PolyhedronType.Symmetry => new SymmetrySourcePolyhedron<T>(Symmetry, _opr),
+                PolyhedronType.Normal => new NormalPolyhedron<T>(Symmetry, _opr),
+                PolyhedronType.Snub => new SnubPolyhedron<T>(Symmetry, _opr),
+                PolyhedronType.Ionic1 => new IonicPolyhedron1<T>(Symmetry, _opr),
+                PolyhedronType.Ionic2 => new IonicPolyhedron2<T>(Symmetry, _opr),
+                PolyhedronType.Dirhombic => new DirhombicPolyhedron<T>(Symmetry, _opr),
+                PolyhedronType.Dual => new DualPolyhedron<T>(Symmetry, _opr),
+                PolyhedronType.SnubDual => new SnubDualPolyhedron<T>(Symmetry, _opr),
                 _ => new NormalPolyhedron<T>(Symmetry, _opr),
             };
         }
     }
 
-    public enum SolidType
+    public enum PolyhedronType
     {
-        球面三角形,
-        通常,
-        変形,
-        半対称1,
-        半対称2,
-        二重斜方,
-        双対,
-        変形双対,
+        Symmetry,
+        Normal,
+        Snub,
+        Ionic1,
+        Ionic2,
+        Dirhombic,
+        Dual,
+        SnubDual,
     }
 }

@@ -20,9 +20,9 @@ namespace Symirror3.Rendering
 
     public record ResetRotation() : IMessage;
 
-    public record ChangeSymbol(SymmetrySymbol Symbol, SolidType SolidType) : IMessage;
+    public record ChangeSymbol(SymmetrySymbol Symbol, PolyhedronType PolyhedronType) : IMessage;
 
-    public record ChangeSolidType(SolidType SolidType) : IMessage;
+    public record ChangePolyhedronType(PolyhedronType PolyhedronType) : IMessage;
 
     public record ChangeFaceVisible(bool[] FaceVisibles) : IMessage;
 
@@ -32,14 +32,14 @@ namespace Symirror3.Rendering
 
     public enum FaceViewType
     {
-        全て表示,
-        各1枚のみ,
-        頂点形状
+        All,
+        OneEach,
+        VertexFigure,
     }
 
     public enum FaceRenderType
     {
-        通常,
-        穴あき,
+        Fill,
+        Holed,
     }
 }

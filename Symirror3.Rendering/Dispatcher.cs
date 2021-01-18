@@ -36,7 +36,7 @@ namespace Symirror3.Rendering
         {
             _graphics = new Graphics(surfaceHandle, width, height);
             _polyhedronSelector = new PolyhedronSelector<Vector3>(Vector3Operator.Instance, symbol);
-            _polyhedron = _polyhedronSelector.GetPolyhedron(SolidType.通常);
+            _polyhedron = _polyhedronSelector.GetPolyhedron(PolyhedronType.Normal);
             _renderer = new StandardPolygonRenderer();
             _filter = new PolygonFilter();
             _renderer.OnActivate(_graphics);
@@ -135,10 +135,10 @@ namespace Symirror3.Rendering
                     break;
                 case ChangeSymbol msg:
                     _polyhedronSelector.Symbol = msg.Symbol;
-                    _polyhedron = _polyhedronSelector.GetPolyhedron(msg.SolidType);
+                    _polyhedron = _polyhedronSelector.GetPolyhedron(msg.PolyhedronType);
                     break;
-                case ChangeSolidType msg:
-                    _polyhedron = _polyhedronSelector.GetPolyhedron(msg.SolidType);
+                case ChangePolyhedronType msg:
+                    _polyhedron = _polyhedronSelector.GetPolyhedron(msg.PolyhedronType);
                     break;
                 case ChangeFaceVisible msg:
                     _filter.HandleMessage(msg);
@@ -150,7 +150,7 @@ namespace Symirror3.Rendering
                     var (light, shadow) = (_renderer.LightFactor, _renderer.ShadowFactor);
                     _renderer = msg.FaceRenderType switch
                     {
-                        FaceRenderType.穴あき => new HoledPolygonRenderer(),
+                        FaceRenderType.Holed => new HoledPolygonRenderer(),
                         _ => new StandardPolygonRenderer(),
                     }; 
                     _renderer.LightFactor = light;

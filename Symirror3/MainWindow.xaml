@@ -15,18 +15,21 @@
         ContentRendered="Window_ContentRendered"
         Closing="Window_Closing">
     <DockPanel>
-        <WindowsFormsHost Width="512" Height="512" DockPanel.Dock="Left" Background="Black">
+        <WindowsFormsHost Width="512" Height="512" DockPanel.Dock="Left" Background="Black"
+                          Cursor="SizeAll">
             <local:DirectXHost Width="512" Height="512" x:Name="drawSuface"
                                MouseDown="DrawSuface_MouseDown"
                                MouseMove="DrawSuface_MouseMove"
-                               MouseUp="DrawSuface_MouseUp"/>
+                               MouseUp="DrawSuface_MouseUp" />
         </WindowsFormsHost>
-        <StackPanel Orientation="Vertical" Width="120" Margin="4,8">
-            <TextBlock Text="球面三角形：" />
+        <ComboBox DockPanel.Dock="Bottom" Margin="4" ItemsSource="{Binding AllLanguages,Mode=OneTime}"
+                  SelectedItem="{Binding Language,Mode=TwoWay}" />
+        <StackPanel Orientation="Vertical" Width="120" Margin="4">
+            <TextBlock Text="{Binding Path=Language.Texts[Symmetry],Mode=OneWay}" />
             <ComboBox ItemsSource="{Binding AllSymbols, Mode=OneTime}" SelectedValue="{Binding Symbol}" Margin="0,3" />
-            <TextBlock Text="多面体の種類：" />
-            <ComboBox ItemsSource="{Binding AllSolidTypes, Mode=OneTime}" SelectedValue="{Binding SolidType}" Margin="0,3" />
-            <GroupBox Header="面の表示" Margin="0,2">
+            <TextBlock Text="{Binding Path=Language.Texts[PolyhedronType],Mode=OneWay}" />
+            <ComboBox ItemsSource="{Binding AllPolyhedronTypes, Mode=OneTime}" SelectedValue="{Binding PolyhedronType}" DisplayMemberPath="ViewText" Margin="0,3" />
+            <GroupBox Header="{Binding Path=Language.Texts[FacesVisiblility],Mode=OneWay}" Margin="0,2">
                 <StackPanel Orientation="Vertical">
                     <Grid>
                         <Grid.Resources>
@@ -58,20 +61,20 @@
                             <CheckBox IsChecked="{Binding FaceVisible4}" />
                         </Border>
                     </Grid>
-                    <ComboBox ItemsSource="{Binding AllFaceViewTypes,Mode=OneTime}" SelectedValue="{Binding FaceViewType}" Margin="0,3" />
-                    <ComboBox ItemsSource="{Binding AllFaceRenderTypes,Mode=OneTime}" SelectedValue="{Binding FaceRenderType}" Margin="0,3" />
+                    <ComboBox ItemsSource="{Binding AllFaceViewTypes,Mode=OneTime}" SelectedValue="{Binding FaceViewType}" DisplayMemberPath="ViewText" Margin="0,3" />
+                    <ComboBox ItemsSource="{Binding AllFaceRenderTypes,Mode=OneTime}" SelectedValue="{Binding FaceRenderType}" DisplayMemberPath="ViewText" Margin="0,3" />
                 </StackPanel>
             </GroupBox>
             <TextBlock>
-                <Run Text="光の強さ："/><Run Text="{Binding Light,Mode=OneWay}"/>
+                <Run Text="{Binding Path=Language.Texts[LightFactor],Mode=OneWay}"/><Run Text="{Binding Light,Mode=OneWay}"/>
             </TextBlock>
             <Slider Minimum="0" Maximum="100" Value="{Binding Light}" IsSnapToTickEnabled="True" TickFrequency="1" />
             <TextBlock>
-                <Run Text="影の強さ："/><Run Text="{Binding Shadow,Mode=OneWay}"/>
+                <Run Text="{Binding Path=Language.Texts[ShadowFactor],Mode=OneWay}"/><Run Text="{Binding Shadow,Mode=OneWay}"/>
             </TextBlock>
             <Slider Minimum="0" Maximum="100" Value="{Binding Shadow}" IsSnapToTickEnabled="True" TickFrequency="1" />
-            <CheckBox Content="自動回転" IsChecked="{Binding AutoRotation}" Margin="0,3"/>
-            <Button Content="回転リセット" Command="{Binding ResetRotationCommand}" Margin="4,3,4,0" />
+            <CheckBox Content="{Binding Path=Language.Texts[AutoRotation],Mode=OneWay}" IsChecked="{Binding AutoRotation}" Margin="0,3"/>
+            <Button Content="{Binding Path=Language.Texts[ResetRotation],Mode=OneWay}" Command="{Binding ResetRotationCommand}" Margin="4,3,4,0" />
             <Canvas Width="112" Height="100">
                 <Polygon Points="56,15 10,90 102,90, 56,15" Stroke="Orange" StrokeThickness="2"/>
                 <Button Width="32" Height="24" Canvas.Left="40" Canvas.Top="11" CommandParameter="0" Command="{Binding MoveBasePointToVertexCommand, Mode=OneTime}" Content="{Binding Symbol[0], Mode=OneWay}" />

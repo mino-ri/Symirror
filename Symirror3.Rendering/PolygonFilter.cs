@@ -12,14 +12,14 @@ namespace Symirror3.Rendering
         private bool[] _faceVisibles = new bool[] { true, true, true, true, true };
         private bool[] _isShown = new bool[] { false, false, false, false, false };
 
-        private FaceViewType _faceViewType = FaceViewType.全て表示;
+        private FaceViewType _faceViewType = FaceViewType.All;
         private Vector3 _targetVertex;
 
         public IEnumerable<PolyhedronFace<Vector3>> Filter(PolyhedronBase<Vector3> source) =>
             _faceViewType switch
             {
-                FaceViewType.各1枚のみ => FilterEachOne(source),
-                FaceViewType.頂点形状 => FilterVertexFigure(source),
+                FaceViewType.OneEach => FilterEachOne(source),
+                FaceViewType.VertexFigure => FilterVertexFigure(source),
                 _ => FilterAll(source),
             };
 
@@ -58,7 +58,7 @@ namespace Symirror3.Rendering
               .Where(face =>
               {
                   var colorType = GetColorType(face);
-                  return _faceViewType == FaceViewType.頂点形状 &&
+                  return _faceViewType == FaceViewType.VertexFigure &&
                     face.Vertices.All(v => !Vector3Operator.Instance.NearlyEqual(_targetVertex, v.Vector, 1f / 32f))
                       ? false
                       : _faceVisibles[colorType];

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Numerics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -8,6 +8,7 @@ using Symirror3.Core;
 using Symirror3.Core.Polyhedrons;
 using Symirror3.Core.Symmetry;
 using Symirror3.Rendering;
+using PType = Symirror3.Core.Polyhedrons.PolyhedronType;
 
 namespace Symirror3
 {
@@ -15,13 +16,21 @@ namespace Symirror3
     {
         private Dispatcher _dispatcher;
 
+        public UILanguage[] AllLanguages => UILanguage.Default;
+        private UILanguage _language = UILanguage.Default[0];
+        public UILanguage Language
+        {
+            get => _language;
+            set => SetValue(ref _language, value);
+        }
+
         public SymmetrySymbol[] AllSymbols => SymmetrySymbol.AllSymbols;
 
         private SymmetrySymbol _symbol = SymmetrySymbol.AllSymbols[12];
         public SymmetrySymbol Symbol
         {
             get => _symbol;
-            set => SetValue(ref _symbol, value, v => new ChangeSymbol(v, _solidType));
+            set => SetValue(ref _symbol, value, v => new ChangeSymbol(v, _polyhedronType.Value));
         }
 
         private bool[] _faceVisibles = { true, true, true, true, true };
@@ -55,41 +64,28 @@ namespace Symirror3
             set => SetValue(ref _faceVisibles[4], value, _ => new ChangeFaceVisible(_faceVisibles));
         }
 
-        public SolidType[] AllSolidTypes => Enum.GetValues<SolidType>();
-        private SolidType _solidType = SolidType.通常;
-        public SolidType SolidType
+        public EnumValue<PType>[] AllPolyhedronTypes { get; }
+        private EnumValue<PType> _polyhedronType;
+        public EnumValue<PType> PolyhedronType
         {
-            get => _solidType;
-            set => SetValue(ref _solidType, value, v => new ChangeSolidType(v));
+            get => _polyhedronType;
+            set => SetValue(ref _polyhedronType, value, v => new ChangePolyhedronType(v.Value));
         }
 
-        public FaceViewType[] AllFaceViewTypes => Enum.GetValues<FaceViewType>();
-        private FaceViewType _faceViewType = FaceViewType.全て表示;
-        public FaceViewType FaceViewType
+        public EnumValue<FaceViewType>[] AllFaceViewTypes { get; }
+        private EnumValue<FaceViewType> _faceViewType;
+        public EnumValue<FaceViewType> FaceViewType
         {
             get => _faceViewType;
-            set => SetValue(ref _faceViewType, value, v => new ChangeFaceViewType(v));
+            set => SetValue(ref _faceViewType, value, v => new ChangeFaceViewType(v.Value));
         }
 
-        public FaceRenderType[] AllFaceRenderTypes => Enum.GetValues<FaceRenderType>();
-        private FaceRenderType _faceRenderType = FaceRenderType.通常;
-        public FaceRenderType FaceRenderType
+        public EnumValue<FaceRenderType>[] AllFaceRenderTypes { get; }
+        private EnumValue<FaceRenderType> _faceRenderType;
+        public EnumValue<FaceRenderType> FaceRenderType
         {
             get => _faceRenderType;
-            set
-            {
-                if (SetValue(ref _faceRenderType, value))
-                {
-                    OnPropertyChanged(nameof(IsRenderTypeHoled));
-                    _dispatcher.SendMessage(new ChangeFaceRenderType(value));
-                }
-            }
-        }
-
-        public bool IsRenderTypeHoled
-        {
-            get => FaceRenderType == FaceRenderType.穴あき;
-            set => FaceRenderType = value ? FaceRenderType.穴あき : FaceRenderType.通常;
+            set => SetValue(ref _faceRenderType, value, v => new ChangeFaceRenderType(v.Value));
         }
 
         private bool _autoRotation;
@@ -141,11 +137,11 @@ namespace Symirror3
         public void MoveBasePointToIncenter(object? _)
         {
             var face = _dispatcher.Symmetry.Faces[0];
-            var point = SolidType switch
+            var point = PolyhedronType.Value switch
             {
-                SolidType.変形 or SolidType.変形双対
+                PType.Snub or PType.SnubDual
                     when Vector3Operator.Instance.TryGetSnubPoint(Symbol, out var p) => p,
-                SolidType.二重斜方
+                PType.Dirhombic
                     when Vector3Operator.Instance.TryGetDirhombicPoint(Symbol, out var p) => p,
                 _ => Vector3Operator.Instance.GetIncenter(face[0].Vector, face[1].Vector, face[2].Vector),
             };
@@ -154,16 +150,23 @@ namespace Symirror3
 
         public ViewModel(Control control)
         {
+            AllPolyhedronTypes = GetEnums<PType>();
+            _polyhedronType = AllPolyhedronTypes[1];
+            AllFaceViewTypes = GetEnums<FaceViewType>();
+            _faceViewType = AllFaceViewTypes[0];
+            AllFaceRenderTypes = GetEnums<FaceRenderType>();
+            _faceRenderType = AllFaceRenderTypes[0];
+
             _dispatcher = new Dispatcher(control.Handle, control.Width, control.Height, Symbol);
             ResetRotationCommand = new ActionCommand(ResetRotation);
             MoveBasePointToVertexCommand = new ActionCommand(MoveBasePointToVertex);
             MoveBasePointToBisectorCrossCommand = new ActionCommand(MoveBasePointToBisectorCross);
             MoveBasePointToIncenterCommand = new ActionCommand(MoveBasePointToIncenter);
 
-            _dispatcher.SendMessage(new ChangeSymbol(Symbol, SolidType));
+            _dispatcher.SendMessage(new ChangeSymbol(Symbol, PolyhedronType.Value));
             _dispatcher.SendMessage(new ChangeLight(Light, Shadow));
-            _dispatcher.SendMessage(new ChangeFaceRenderType(FaceRenderType));
-            _dispatcher.SendMessage(new ChangeFaceViewType(FaceViewType));
+            _dispatcher.SendMessage(new ChangeFaceRenderType(FaceRenderType.Value));
+            _dispatcher.SendMessage(new ChangeFaceViewType(FaceViewType.Value));
             _dispatcher.SendMessage(new ChangeFaceVisible(_faceVisibles));
         }
 
@@ -198,5 +201,40 @@ namespace Symirror3
         }
 
         public void Dispose() => _dispatcher.Dispose();
+
+        private EnumValue<TEnum>[] GetEnums<TEnum>() where TEnum : struct, Enum
+        {
+            return Enum.GetValues<TEnum>()
+                .Select(e => new EnumValue<TEnum>(e, this))
+                .ToArray();
+        }
+    }
+
+    public class EnumValue<TEnum> : INotifyPropertyChanged
+        where TEnum : struct, Enum
+    {
+        private readonly ViewModel _parent;
+
+        public TEnum Value { get; }
+
+        public string ViewText => _parent.Language.EnumNames[Value];
+
+        public EnumValue(TEnum value, ViewModel parent)
+        {
+            Value = value;
+            _parent = parent;
+            _parent.PropertyChanged += (sender, e) =>
+            {
+                if (e.PropertyName == nameof(ViewModel.Language))
+                    OnPropertyChanged(nameof(ViewText));
+            };
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }
