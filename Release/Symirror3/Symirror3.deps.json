@@ -1,0 +1,115 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "Symirror3/1.0.0": {
+        "dependencies": {
+          "Symirror3.Core": "1.0.0",
+          "Symirror3.Rendering": "1.0.0"
+        },
+        "runtime": {
+          "Symirror3.dll": {}
+        }
+      },
+      "Symirror3.Core/1.0.0": {
+        "runtime": {
+          "Symirror3.Core.dll": {}
+        }
+      },
+      "Symirror3.Rendering/1.0.0": {
+        "dependencies": {
+          "Symirror3.Core": "1.0.0"
+        },
+        "runtime": {
+          "Symirror3.Rendering.dll": {}
+        }
+      },
+      "IndirectX/1.0.0.0": {
+        "runtime": {
+          "IndirectX.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "IndirectX.EasyRenderer/1.0.0.0": {
+        "runtime": {
+          "IndirectX.EasyRenderer.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "IndirectX.D3D11/1.0.0.0": {
+        "runtime": {
+          "IndirectX.D3D11.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "IndirectX.Dxgi/1.0.0.0": {
+        "runtime": {
+          "IndirectX.Dxgi.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "IndirectX.D3DCompiler/1.0.0.0": {
+        "runtime": {
+          "IndirectX.D3DCompiler.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Symirror3/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Symirror3.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Symirror3.Rendering/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "IndirectX/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "IndirectX.EasyRenderer/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "IndirectX.D3D11/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "IndirectX.Dxgi/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "IndirectX.D3DCompiler/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
