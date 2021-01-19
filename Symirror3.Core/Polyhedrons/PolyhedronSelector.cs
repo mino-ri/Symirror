@@ -9,15 +9,15 @@ namespace Symirror3.Core.Polyhedrons
         public SymmetrySymbol Symbol
         {
             get => Symmetry.Symbol;
-            set => Symmetry = new Symmetry<T>(value, _opr);
+            set => Symmetry = new SymmetryGroup(value);
         }
 
-        public Symmetry<T> Symmetry { get; private set; }
+        public SymmetryGroup Symmetry { get; private set; }
 
         public PolyhedronSelector(IVectorOperator<T> opr, SymmetrySymbol symbol)
         {
             _opr = opr;
-            Symmetry = new Symmetry<T>(symbol, _opr);
+            Symmetry = new SymmetryGroup(symbol);
         }
 
         public PolyhedronBase<T> GetPolyhedron(PolyhedronType polyhedronType)

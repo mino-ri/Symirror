@@ -10,10 +10,10 @@ namespace Symirror3.Core.Polyhedrons
         public PolyhedronFace<T>[] Faces { get; }
         protected readonly IVectorOperator<T> _opr;
 
-        public Symmetry<T> Symmetry { get; }
+        public SymmetryGroup Symmetry { get; }
 
-        private T _basePoint;
-        public T BasePoint
+        private SphericalPoint _basePoint;
+        public SphericalPoint BasePoint
         {
             get => _basePoint;
             set
@@ -23,18 +23,18 @@ namespace Symirror3.Core.Polyhedrons
             }
         }
 
-        protected PolyhedronBase(Symmetry<T> symmetry, IVectorOperator<T> opr)
+        protected PolyhedronBase(SymmetryGroup symmetry, IVectorOperator<T> opr)
         {
             Symmetry = symmetry;
             _opr = opr;
-            _basePoint = opr.Create(0.0, 0.0, 1.0);
+            _basePoint = new SphericalPoint(0.0, 0.0, 1.0);
             Vertices = GetVertices(symmetry).ToArray();
             Faces = GetFaces(symmetry).ToArray();
             OnBasePointChanged(_basePoint);
         }
 
-        protected abstract IEnumerable<PolyhedronVertex<T>> GetVertices(Symmetry<T> symmetry);
-        protected abstract IEnumerable<PolyhedronFace<T>> GetFaces(Symmetry<T> symmetry);
-        protected abstract void OnBasePointChanged(T value);
+        protected abstract IEnumerable<PolyhedronVertex<T>> GetVertices(SymmetryGroup symmetry);
+        protected abstract IEnumerable<PolyhedronFace<T>> GetFaces(SymmetryGroup symmetry);
+        protected abstract void OnBasePointChanged(SphericalPoint value);
     }
 }

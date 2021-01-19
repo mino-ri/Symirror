@@ -7,23 +7,22 @@ namespace Symirror3.Core.Polyhedrons
 {
     public abstract class WythoffianPolyhedron<T> : PolyhedronBase<T>
     {
-        protected WythoffianPolyhedron(Symmetry<T> symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
+        protected WythoffianPolyhedron(SymmetryGroup symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
 
-        protected override IEnumerable<PolyhedronVertex<T>> GetVertices(Symmetry<T> symmetry)
+        protected override IEnumerable<PolyhedronVertex<T>> GetVertices(SymmetryGroup symmetry)
         {
             return symmetry.Faces
                 .Select(f => new PolyhedronVertex<T>(_opr.Zero, f));
         }
 
-        protected override void OnBasePointChanged(T value)
+        protected override void OnBasePointChanged(SphericalPoint value)
         {
-            Vertices[0].Vector = value;
+            Vertices[0].Vector = _opr.Convert(value);
             for (int i = 1; i < Vertices.Length; i++)
             {
                 var copyDef = CopyDifinitions[i - 1];
-                Vertices[i].Vector = _opr.Reverse(Vertices[copyDef.Source].Vector,
-                    Symmetry[copyDef.Source][copyDef.ReverseEdge1].Vector,
-                    Symmetry[copyDef.Source][copyDef.ReverseEdge2].Vector);
+                Vertices[i].Vector = Symmetry[copyDef.Source].Edge(copyDef.ReverseEdge)
+                    .Reverse(Vertices[copyDef.Source].Vector, _opr);
             }
         }
 
@@ -39,7 +38,7 @@ namespace Symirror3.Core.Polyhedrons
             {
                 var current = Symmetry.Faces[i];
                 var source = Symmetry.Faces.Take(i).First(current.IsNext);
-                result[i - 1] = new CopyDifinition(source.Index, Array.FindAll(indices, n => current[n] == source[n]));
+                result[i - 1] = new CopyDifinition(source.Index, Array.Find(indices, n => current[n] != source[n]));
             }
             return result;
         }
@@ -50,15 +49,12 @@ namespace Symirror3.Core.Polyhedrons
             // コピー元となる球面三角形のインデックス
             public readonly int Source;
             // コピーに使用する辺の両端の頂点のElementType
-            public readonly int ReverseEdge1;
-            // コピーに使用する辺の両端の頂点のElementType
-            public readonly int ReverseEdge2;
+            public readonly int ReverseEdge;
 
-            public CopyDifinition(int source, int[] reverseEdges)
+            public CopyDifinition(int source, int reverseEdge)
             {
                 Source = source;
-                ReverseEdge1 = reverseEdges[0];
-                ReverseEdge2 = reverseEdges[1];
+                ReverseEdge = reverseEdge;
             }
         }
     }

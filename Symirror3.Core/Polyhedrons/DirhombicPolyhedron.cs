@@ -6,9 +6,9 @@ namespace Symirror3.Core.Polyhedrons
 {
     public class DirhombicPolyhedron<T> : SnubPolyhedron<T>
     {
-        public DirhombicPolyhedron(Symmetry<T> symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
+        public DirhombicPolyhedron(SymmetryGroup symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
 
-        protected override IEnumerable<PolyhedronFace<T>> GetFaces(Symmetry<T> symmetry)
+        protected override IEnumerable<PolyhedronFace<T>> GetFaces(SymmetryGroup symmetry)
         {
             if (symmetry.Symbol[0] != 2)
                 return base.GetFaces(symmetry);

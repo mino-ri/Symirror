@@ -34,7 +34,7 @@ namespace Symirror3.Core.Numerics
             return new Quaternion(-X * invNorm, -Y * invNorm, -Z * invNorm, W * invNorm);
         }
 
-        public static Quaternion FromAxisAngle(Vector3 axis, double angle)
+        public static Quaternion FromAxisAngle(Vector3D axis, double angle)
         {
             var halfAngle = angle * 0.5;
             var sin = Sin(halfAngle);
@@ -71,9 +71,9 @@ namespace Symirror3.Core.Numerics
 
         public override string ToString() => $"[{X}, {Y}, {Z}, {W}]";
 
-        public Vector3 ToBasePoint()
+        public Vector3D ToBasePoint()
         {
-            return new Vector3(
+            return new Vector3D(
                 2.0 * (X * Z + Y * W),
                 2.0 * (Y * Z - X * W),
                 Z * Z + W * W - X * X - Y * Y);
@@ -87,14 +87,14 @@ namespace Symirror3.Core.Numerics
                 (float)(Z * Z + W * W - X * X - Y * Y));
         }
 
-        public static Vector3 operator *(Quaternion a, Vector3 v)
+        public static Vector3D operator *(Quaternion a, Vector3D v)
         {
             var sx = a.W * v.X + a.Y * v.Z - a.Z * v.Y;
             var sy = a.W * v.Y + a.Z * v.X - a.X * v.Z;
             var sz = a.W * v.Z + a.X * v.Y - a.Y * v.X;
             var sw = a.X * v.X + a.Y * v.Y + a.Z * v.Z;
 
-            return new Vector3(
+            return new Vector3D(
                 sx * a.W + sw * a.X + sz * a.Y - sy * a.Z,
                 sy * a.W + sw * a.Y + sx * a.Z - sz * a.X,
                 sz * a.W + sw * a.Z + sy * a.X - sx * a.Y);

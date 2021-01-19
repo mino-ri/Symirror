@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using Symirror3.Core.Polyhedrons;
 using Symirror3.Core.Symmetry;
+using Symirror3.Core;
 
 namespace Symirror3.Rendering
 {
@@ -10,9 +11,9 @@ namespace Symirror3.Rendering
 
     public record MoveBasePoint(float RotateX, float RotateY) : IMessage;
 
-    public record MoveBasePointTo(Vector3 To) : IMessage;
+    public record MoveBasePointTo(SphericalPoint To) : IMessage;
 
-    public record MoveBasePointFromTo(Vector3 From, Vector3 To, int FrameCount) : IMessage;
+    public record MoveBasePointFromTo(SphericalPoint From, SphericalPoint To, int FrameCount) : IMessage;
 
     public record Rotate(float RotateX, float RotateY, float RotateZ) : IMessage;
 

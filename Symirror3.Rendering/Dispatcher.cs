@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Symirror3.Core.Polyhedrons;
 using Symirror3.Core.Symmetry;
-using Sphere = Symirror3.Core.Sphere;
+using Symirror3.Core;
 using IndirectX;
 
 namespace Symirror3.Rendering
@@ -30,7 +30,7 @@ namespace Symirror3.Rendering
         private PolygonRenderer _renderer;
         private PolygonFilter _filter;
 
-        public Symmetry<Vector3> Symmetry => _polyhedronSelector.Symmetry;
+        public SymmetryGroup Symmetry => _polyhedronSelector.Symmetry;
 
         public Dispatcher(IntPtr surfaceHandle, int width, int height, SymmetrySymbol symbol)
         {
@@ -143,8 +143,8 @@ namespace Symirror3.Rendering
         private void HandleMessageCore(MoveBasePointTo msg)
         {
             if (HasTask<MoveBasePointFromTo>()) return;
-            var distance = MathF.Acos(Math.Clamp(Vector3.Dot(_polyhedron.BasePoint, msg.To), -1f, 1f));
-            if (distance <= MathF.PI / 180f)
+            var distance = Math.Acos(Math.Clamp(SphericalPoint.Dot(_polyhedron.BasePoint, msg.To), -1.0, 1.0));
+            if (distance <= Math.PI / 180.0)
             {
                 _polyhedron.BasePoint = msg.To;
                 return;
@@ -158,7 +158,7 @@ namespace Symirror3.Rendering
             if (HasTask<MoveBasePointFromTo>()) return;
             StartCountTask(msg, msg.FrameCount, (m, count) =>
             {
-                _polyhedron.BasePoint = Sphere.Lerp(Vector3Operator.Instance, m.To, m.From, (double)count / m.FrameCount);
+                _polyhedron.BasePoint = SphericalPoint.Lerp(m.To, m.From, (double)count / m.FrameCount);
             });
         }
 

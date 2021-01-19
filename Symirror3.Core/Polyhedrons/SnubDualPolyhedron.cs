@@ -7,16 +7,16 @@ namespace Symirror3.Core.Polyhedrons
 {
     public class SnubDualPolyhedron<T> : WythoffianPolyhedron<T>
     {
-        public SnubDualPolyhedron(Symmetry<T> symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
+        public SnubDualPolyhedron(SymmetryGroup symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
 
-        protected override IEnumerable<PolyhedronVertex<T>> GetVertices(Symmetry<T> symmetry)
+        protected override IEnumerable<PolyhedronVertex<T>> GetVertices(SymmetryGroup symmetry)
         {
             return symmetry.Faces
                 .Select(f => new PolyhedronVertex<T>(_opr.Zero, f))
-                .Concat(symmetry.Vertices.Select(v => new PolyhedronVertex<T>(v.Vector, v)));
+                .Concat(symmetry.Vertices.Select(v => new PolyhedronVertex<T>(_opr.Convert(v.Point), v)));
         }
 
-        protected override IEnumerable<PolyhedronFace<T>> GetFaces(Symmetry<T> symmetry)
+        protected override IEnumerable<PolyhedronFace<T>> GetFaces(SymmetryGroup symmetry)
         {
             var count = symmetry.Faces.Count;
             return symmetry
@@ -45,25 +45,25 @@ namespace Symirror3.Core.Polyhedrons
                 .ToArray();
         }
 
-        protected override void OnBasePointChanged(T value)
+        protected override void OnBasePointChanged(SphericalPoint value)
         {
             var polygon = Symmetry[0];
 
             // ねじれのみの特殊な頂点位置を求める
             var ard = Enumerable.Range(0, 3)
-                .Select(i => _opr.Reverse(value, polygon[i].Vector, polygon[(i + 1) % 3].Vector))
+                .Select(i => polygon.Edge((i + 2)% 3).Reverse(value))
                 .ToArray();
 
-            var snubPoint = _opr.Normalize(_opr.Sum(ard)); // 重心
+            var snubPoint = SphericalPoint.Normalize(ard[0] + ard[1] + ard[2]); // 重心
             var snubDistance = 1.0;
 
             for (var i = 0; i < 3; i++)
-                ard[i] = _opr.Reverse(snubPoint, polygon[i].Vector, polygon[(i + 1) % 3].Vector);
+                ard[i] = polygon.Edge((i + 2) % 3).Reverse(snubPoint);
 
-            var normal = _opr.Normalize(_opr.Cross(_opr.Subtract(ard[1], ard[0]), _opr.Subtract(ard[2], ard[0])));
+            var normal = SphericalPoint.Normalize((ard[1] - ard[0]) % (ard[2] - ard[0]));
 
             // カタランの立体と同じ位置にある頂点の距離
-            var distances = polygon.Select(v => _opr.GetCrossPoint(v.Vector, normal, ard[0])).ToArray();
+            var distances = polygon.Select(v => SphericalPoint.GetCrossPoint(v.Point, normal, ard[0])).ToArray();
 
             // 立体の外接球を統一する
             var max = Math.Max(distances.Select(Math.Abs).Max(), Math.Abs(snubDistance));
@@ -73,10 +73,10 @@ namespace Symirror3.Core.Polyhedrons
 
             // カタランの立体と同じ位置にある頂点
             for (var i = 0; i < Symmetry.Vertices.Count; i++)
-                Vertices[Symmetry.Order + i].Vector = _opr.Multiply(Symmetry.Vertices[i].Vector, distances[Symmetry.Vertices[i].ElementType]);
+                Vertices[Symmetry.Order + i].Vector = _opr.Convert(Symmetry.Vertices[i].Point * distances[Symmetry.Vertices[i].ElementType]);
 
             // 一様多面体と同じ位置にある頂点
-            Vertices[0].Vector = _opr.Multiply(snubPoint, snubDistance);
+            Vertices[0].Vector = _opr.Convert(snubPoint * snubDistance);
             CopyUniformVertices();
         }
 
@@ -87,9 +87,8 @@ namespace Symirror3.Core.Polyhedrons
             {
                 var copyDef = CopyDifinitions[i - 1];
                 var source = copyDef.Source;
-                var edge1 = copyDef.ReverseEdge1;
-                var edge2 = copyDef.ReverseEdge2;
-                Vertices[i].Vector = _opr.Reverse(Vertices[source].Vector, Symmetry[source][edge1].Vector, Symmetry[source][edge2].Vector);
+                var edge = copyDef.ReverseEdge;
+                Vertices[i].Vector = Symmetry[source].Edge(edge).Reverse(Vertices[source].Vector, _opr);
             }
         }
     }

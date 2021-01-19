@@ -4,35 +4,35 @@ using System.Linq;
 
 namespace Symirror3.Core.Symmetry
 {
-    public class Symmetry<T>
+    public class SymmetryGroup
     {
-        private readonly SymmetryTriangle<T>[] _faces;
-        private readonly SymmetryVertex<T>[] _vertices;
+        private readonly SymmetryTriangle[] _faces;
+        private readonly SymmetryVertex[] _vertices;
 
         public SymmetrySymbol Symbol { get; }
 
         /// <summary>この球面充填を構成する球面三角形を列挙します。</summary>
-        public IReadOnlyList<SymmetryTriangle<T>> Faces => _faces;
+        public IReadOnlyList<SymmetryTriangle> Faces => _faces;
 
         /// <summary>この球面充填の頂点リストを列挙します。頂点は、その種類によってグループ化されています。</summary>
-        public IReadOnlyList<SymmetryVertex<T>> Vertices => _vertices;
+        public IReadOnlyList<SymmetryVertex> Vertices => _vertices;
 
         /// <summary>この球面充填を構成する球面三角形の数を取得します。</summary>
         public int Order => _faces.Length;
 
         /// <summary>指定したインデックスを持つこの球面充填を構成する球面三角形を取得します。</summary>
-        public SymmetryTriangle<T> this[int index] => _faces[index];
+        public SymmetryTriangle this[int index] => _faces[index];
 
-        public Symmetry(SymmetrySymbol symbol, IVectorOperator<T> opr)
+        public SymmetryGroup(SymmetrySymbol symbol)
         {
             Symbol = symbol;
-            (_vertices, _faces) = new Builder(symbol, opr).GetTriangles();
+            (_vertices, _faces) = new Builder(symbol).GetTriangles();
         }
 
         /// <summary>指定した頂点の周囲にある面を、隣接する順に列挙します。</summary>
         /// <param name="vertex">調査する頂点。</param>
         /// <returns>指定した頂点の周囲にある面のシーケンス。</returns>
-        public IEnumerable<SymmetryTriangle<T>> GetAround(SymmetryVertex<T> vertex)
+        public IEnumerable<SymmetryTriangle> GetAround(SymmetryVertex vertex)
         {
             var list = _faces.Where(t => t.Contains(vertex)).ToList();
             if (list.Count == 0) yield break;
@@ -49,7 +49,7 @@ namespace Symirror3.Core.Symmetry
         /// <summary>指定した面と辺を介して隣接している面を列挙します。</summary>
         /// <param name="face">調査する面。</param>
         /// <returns>face と辺を介して隣接している面のシーケンス。</returns>
-        public IEnumerable<SymmetryTriangle<T>> GetNexts(SymmetryTriangle<T> face)
+        public IEnumerable<SymmetryTriangle> GetNexts(SymmetryTriangle face)
         {
             var list = _faces.Where(face.IsNext).ToList();
             if (list.Count == 0) yield break;
@@ -66,7 +66,7 @@ namespace Symirror3.Core.Symmetry
         /// <summary>指定した面と辺を介して隣接しており、指定した点を含まない面を取得します。</summary>
         /// <param name="face"></param>
         /// <param name="point"></param>
-        public SymmetryTriangle<T> GetSingleNext(SymmetryTriangle<T> face, SymmetryVertex<T> point)
+        public SymmetryTriangle GetSingleNext(SymmetryTriangle face, SymmetryVertex point)
         {
             return _faces.First(f => f[point.ElementType] != point && face.IsNext(f));
         }
@@ -74,21 +74,19 @@ namespace Symirror3.Core.Symmetry
         private class Builder
         {
             private readonly SymmetrySymbol _symbol;
-            private readonly IVectorOperator<T> _opr;
             // それぞれのElementTypeを持つ頂点にいくつの面が集まるか
             private readonly int[] _faceCounts;
             // 最終的な出力となる面
-            private readonly List<SymmetryTriangle<T>> _faces;
+            private readonly List<SymmetryTriangle> _faces;
             // 各頂点と、現在集まっている面の数のペア
-            private readonly Dictionary<SymmetryVertex<T>, int> _vertices;
+            private readonly Dictionary<SymmetryVertex, int> _vertices;
             // 次に周囲を探索する faces のインデックス
             private int _faceIndex;
 
-            public Builder(SymmetrySymbol symbol, IVectorOperator<T> opr)
+            public Builder(SymmetrySymbol symbol)
             {
-                var firstFace = SymmetryTriangle<T>.CreateTrianglCore(opr, symbol.F0, symbol.F1, symbol.F2);
+                var firstFace = SymmetryTriangle.CreateTrianglCore(symbol.F0, symbol.F1, symbol.F2);
                 _symbol = symbol;
-                _opr = opr;
                 _faceCounts = _symbol.Select(s => s.Numerator * 2).ToArray();
                 _faces = new() { firstFace };
                 _faceIndex = 0;
@@ -98,7 +96,7 @@ namespace Symirror3.Core.Symmetry
                     _vertices[v] = 1;
             }
 
-            public (SymmetryVertex<T>[], SymmetryTriangle<T>[]) GetTriangles()
+            public (SymmetryVertex[], SymmetryTriangle[]) GetTriangles()
             {
                 while (_vertices.Any(kv => kv.Value < _faceCounts[kv.Key.ElementType]))
                 {
@@ -118,12 +116,12 @@ namespace Symirror3.Core.Symmetry
                 var newFace = _faces[_faceIndex].ToArray();
 
                 // reverseIndex を含まない辺で対象の頂点を裏返す
-                var vector = _opr.Reverse(newFace[reverseIndex].Vector,
-                    newFace[(reverseIndex + 1) % 3].Vector,
-                    newFace[(reverseIndex + 2) % 3].Vector);
+                
+                var vector = new SphericalRing(newFace[(reverseIndex + 1) % 3].Point, newFace[(reverseIndex + 2) % 3].Point)
+                    .Reverse(newFace[reverseIndex].Point);
 
                 // 同一とみなせる頂点を探す
-                if (_vertices.Keys.FirstOrDefault(v => v.ElementType == reverseIndex && _opr.NearlyEqual(v.Vector, vector)) is { } vertex)
+                if (_vertices.Keys.FirstOrDefault(v => v.ElementType == reverseIndex && SphericalPoint.NearlyEqual(v.Point, vector)) is { } vertex)
                 {
                     newFace[reverseIndex] = vertex;
                     // 見付かった頂点にこれ以上辺を追加できないか、同一の面が存在する場合
@@ -132,14 +130,15 @@ namespace Symirror3.Core.Symmetry
                 }
                 else
                 {
-                    newFace[reverseIndex] = new SymmetryVertex<T>(vector, reverseIndex, _vertices.Count);
+                    newFace[reverseIndex] = new SymmetryVertex(vector, reverseIndex, _vertices.Count);
                     _vertices[newFace[reverseIndex]] = 0;
                 }
 
                 foreach (var v in newFace)
                     _vertices[v] += 1;
 
-                _faces.Add(new SymmetryTriangle<T>(_faces[_faceIndex].ElementType ^ 1, _faces.Count, newFace));
+                _faces.Add(new SymmetryTriangle(_faces[_faceIndex].ElementType ^ 1, _faces.Count,
+                    newFace[0], newFace[1], newFace[2]));
             }
         }
     }

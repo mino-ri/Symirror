@@ -59,11 +59,11 @@ namespace Symirror3.Core
             new(2, (3, 2), (5, 3)),
         };
 
-        public static bool TryGetSnubPoint<T>(this IVectorOperator<T> opr, SymmetrySymbol symbol, [NotNullWhen(true)] out T result)
+        public static bool TryGetSnubPoint(SymmetrySymbol symbol, [NotNullWhen(true)] out SphericalPoint result)
         {
             if (SnubPoints.TryGetValue(symbol, out var p))
             {
-                result = opr.Create(p.x, p.y, p.z)!;
+                result = new(p.x, p.y, p.z)!;
                 return true;
             }
             else
@@ -73,11 +73,11 @@ namespace Symirror3.Core
             }
         }
 
-        public static bool TryGetDirhombicPoint<T>(this IVectorOperator<T> opr, SymmetrySymbol symbol, [NotNullWhen(true)] out T result)
+        public static bool TryGetDirhombicPoint(SymmetrySymbol symbol, [NotNullWhen(true)] out SphericalPoint result)
         {
             if (DirhombicSymbols.Contains(symbol))
             {
-                result = opr.Create(0.618033989, 0.786151378, 0)!;
+                result = new(0.618033989, 0.786151378, 0)!;
                 return true;
             }
             else

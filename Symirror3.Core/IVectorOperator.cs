@@ -35,6 +35,12 @@ namespace Symirror3.Core
 
         public static bool NearlyEqual<T>(this IVectorOperator<T> opr, T x, T y) => opr.NearlyEqual(x, y, DefaultError);
 
+        public static T Convert<T>(this IVectorOperator<T> opr, SphericalPoint point) =>
+            opr.Create(point.X, point.Y, point.Z);
+
+        public static T Convert<T>(this IVectorOperator<T> opr, Numerics.Vector3D point) =>
+            opr.Create(point.X, point.Y, point.Z);
+
         /// <summary>ベクトル シーケンスの総和を計算します。</summary>
         /// <param name="source">対象のシーケンス。</param>
         /// <returns>対象シーケンスの総和。</returns>

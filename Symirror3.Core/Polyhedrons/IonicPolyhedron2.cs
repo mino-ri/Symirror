@@ -6,9 +6,9 @@ namespace Symirror3.Core.Polyhedrons
 {
     public class IonicPolyhedron2<T> : SnubPolyhedron<T>
     {
-        public IonicPolyhedron2(Symmetry<T> symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
+        public IonicPolyhedron2(SymmetryGroup symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
 
-        protected override IEnumerable<PolyhedronFace<T>> GetFaces(Symmetry<T> symmetry)
+        protected override IEnumerable<PolyhedronFace<T>> GetFaces(SymmetryGroup symmetry)
         {
             // このタイプの半オーダー多面体が作れない場合
             if (symmetry.Symbol.Count(x => x.Numerator % 2 == 0) < 2)
@@ -26,7 +26,7 @@ namespace Symirror3.Core.Polyhedrons
 
             facePickFlags[0] = true;
 
-            var queue = new Queue<SymmetryTriangle<T>>();
+            var queue = new Queue<SymmetryTriangle>();
             queue.Enqueue(symmetry.Faces[0]);
 
             while (leftFace > 0)

@@ -6,9 +6,9 @@ namespace Symirror3.Core.Polyhedrons
 {
     public class SnubPolyhedron<T> : WythoffianPolyhedron<T>
     {
-        public SnubPolyhedron(Symmetry<T> symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
+        public SnubPolyhedron(SymmetryGroup symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
 
-        protected override IEnumerable<PolyhedronFace<T>> GetFaces(Symmetry<T> symmetry)
+        protected override IEnumerable<PolyhedronFace<T>> GetFaces(SymmetryGroup symmetry)
         {
             // 回転する面, ひとつの頂点のまわりを、ひとつ飛ばしで結ぶ
             var rotationFaces = symmetry.Vertices

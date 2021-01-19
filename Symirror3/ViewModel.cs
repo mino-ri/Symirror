@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Symirror3.Core;
-using Symirror3.Core.Polyhedrons;
 using Symirror3.Core.Symmetry;
 using Symirror3.Rendering;
 using PType = Symirror3.Core.Polyhedrons.PolyhedronType;
@@ -119,7 +118,8 @@ namespace Symirror3
         public ICommand MoveBasePointToVertexCommand { get; }
         public void MoveBasePointToVertex(object? arg)
         {
-            var point = _dispatcher.Symmetry.Faces[0][Math.Clamp(ParseInt(arg), 0, 2)].Vector;
+            var index = Math.Clamp(ParseInt(arg), 0, 2);
+            var point = _dispatcher.Symmetry.Faces[0][index].Point;
             _dispatcher.SendMessage(new MoveBasePointTo(point));
         }
 
@@ -128,8 +128,7 @@ namespace Symirror3
         {
             var index = Math.Clamp(ParseInt(arg), 0, 2);
             var face = _dispatcher.Symmetry.Faces[0];
-            var point = Sphere.GetBisectorCross(Vector3Operator.Instance,
-                face[index].Vector, face[(index + 1) % 3].Vector, face[(index + 2) % 3].Vector);
+            var point = face.GetBisectorCross(index);
             _dispatcher.SendMessage(new MoveBasePointTo(point));
         }
 
@@ -140,10 +139,10 @@ namespace Symirror3
             var point = PolyhedronType.Value switch
             {
                 PType.Snub or PType.SnubDual
-                    when Vector3Operator.Instance.TryGetSnubPoint(Symbol, out var p) => p,
+                    when PolyhedronUtilities.TryGetSnubPoint(Symbol, out var p) => p,
                 PType.Dirhombic
-                    when Vector3Operator.Instance.TryGetDirhombicPoint(Symbol, out var p) => p,
-                _ => Vector3Operator.Instance.GetIncenter(face[0].Vector, face[1].Vector, face[2].Vector),
+                    when PolyhedronUtilities.TryGetDirhombicPoint(Symbol, out var p) => p,
+                _ => face.GetIncenter(),
             };
             _dispatcher.SendMessage(new MoveBasePointTo(point));
         }
