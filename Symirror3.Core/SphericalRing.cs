@@ -30,5 +30,9 @@ namespace Symirror3.Core
 
         public static double Angle(in SphericalRing a, in SphericalRing b) =>
             SphericalPoint.Distance(in a.Normal, in b.Normal);
+
+        public static bool operator ==(SphericalRing a, SphericalRing b) => a.Equals(b);
+
+        public static bool operator !=(SphericalRing a, SphericalRing b) => !a.Equals(b);
     }
 }

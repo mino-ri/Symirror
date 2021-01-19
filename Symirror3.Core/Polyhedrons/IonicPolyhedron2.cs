@@ -39,7 +39,7 @@ namespace Symirror3.Core.Polyhedrons
                     if (!facePickFlags[f.Index].HasValue)
                     {
                         // 0 or 1配置なので、採用済のものと採用状況を同じにする
-                        facePickFlags[f.Index] = facePickFlags[targetFace.Index].Value;
+                        facePickFlags[f.Index] = facePickFlags[targetFace.Index];
                         queue.Enqueue(f);
                         leftFace--;
                     }
@@ -57,15 +57,16 @@ namespace Symirror3.Core.Polyhedrons
                     // 2枚連続して採用フラグが決定されている面を探す
                     for (var i = 0; i < aroundFaces.Length; i++)
                     {
-                        if (facePickFlags[aroundFaces[i].Index].HasValue &&
-                            facePickFlags[aroundFaces[(i + 1) % aroundFaces.Length].Index].HasValue)
+                        var flag1 = facePickFlags[aroundFaces[i].Index];
+                        var flag2 = facePickFlags[aroundFaces[(i + 1) % aroundFaces.Length].Index];
+                        if (flag1.HasValue && flag2.HasValue)
                         {
                             baseIndex = i;
 
-                            flags[0] = facePickFlags[aroundFaces[i].Index].Value;
-                            flags[1] = facePickFlags[aroundFaces[(i + 1) % aroundFaces.Length].Index].Value;
-                            flags[2] = !facePickFlags[aroundFaces[i].Index].Value;
-                            flags[3] = !facePickFlags[aroundFaces[(i + 1) % aroundFaces.Length].Index].Value;
+                            flags[0] = flag1.Value;
+                            flags[1] = flag2.Value;
+                            flags[2] = !flag1.Value;
+                            flags[3] = !flag2.Value;
                             break;
                         }
                     }
@@ -92,7 +93,7 @@ namespace Symirror3.Core.Polyhedrons
                 {
                     var vertices = symmetry
                             .GetAround(v)
-                            .Where(x => facePickFlags[x.Index].Value)
+                            .Where(x => facePickFlags[x.Index]!.Value)
                             .Select(f => Vertices[f.Index])
                             .ToArray();
 

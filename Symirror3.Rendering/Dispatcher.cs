@@ -25,10 +25,10 @@ namespace Symirror3.Rendering
         private Task? _renderLoop;
         private int _rotateCount;
 
-        private PolyhedronSelector<Vector3> _polyhedronSelector;
+        private readonly PolyhedronSelector<Vector3> _polyhedronSelector;
         private PolyhedronBase<Vector3> _polyhedron;
         private PolygonRenderer _renderer;
-        private PolygonFilter _filter;
+        private readonly PolygonFilter _filter;
 
         public SymmetryGroup Symmetry => _polyhedronSelector.Symmetry;
 
@@ -199,7 +199,7 @@ namespace Symirror3.Rendering
             }
         }
 
-        private void HandleMessageCore(ResetRotation msg)
+        private void HandleMessageCore(ResetRotation _)
         {
             _graphics.SetWorld(in Matrix4.Identity);
             _rotateCount = 0;
@@ -230,11 +230,13 @@ namespace Symirror3.Rendering
             _renderer.OnActivate(_graphics);
         }
 
+        #pragma warning disable CA1822 // メンバーを static に設定します
         private void HandleMessageCore(IMessage message)
+        #pragma warning restore CA1822
         {
             System.Diagnostics.Debug.Print($"Unhandled message: {message?.GetType().Name ?? "[null]"}");
         }
-#endregion
+        #endregion
 
         private bool HasTask<T>() where T : IMessage => _frameTasks.Any(t => t.Message is T);
 

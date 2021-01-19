@@ -9,11 +9,12 @@ using Symirror3.Core.Symmetry;
 using Symirror3.Rendering;
 using PType = Symirror3.Core.Polyhedrons.PolyhedronType;
 
+#pragma warning disable CA1822 // メンバーを static に設定します
 namespace Symirror3
 {
-    public class ViewModel : INotifyPropertyChanged, IDisposable
+    public sealed class ViewModel : INotifyPropertyChanged, IDisposable
     {
-        private Dispatcher _dispatcher;
+        private readonly Dispatcher _dispatcher;
 
         public UILanguage[] AllLanguages => UILanguage.Default;
         private UILanguage _language = UILanguage.Default[0];
@@ -32,7 +33,7 @@ namespace Symirror3
             set => SetValue(ref _symbol, value, v => new ChangeSymbol(v, _polyhedronType.Value));
         }
 
-        private bool[] _faceVisibles = { true, true, true, true, true };
+        private readonly bool[] _faceVisibles = { true, true, true, true, true };
         public bool FaceVisible0
         {
             get => _faceVisibles[0];
@@ -189,7 +190,7 @@ namespace Symirror3
             if (SetValue(ref storage, value, propertyName)) _dispatcher.SendMessage(action(value));
         }
 
-        private int ParseInt(object? index)
+        private static int ParseInt(object? index)
         {
             return index switch
             {

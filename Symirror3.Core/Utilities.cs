@@ -9,14 +9,12 @@ namespace Symirror3.Core
     {
         public static IEnumerable<T> Pairwise<T>(IEnumerable<T> first, IEnumerable<T> second)
         {
-            using (var e1 = first.GetEnumerator())
-            using (var e2 = second.GetEnumerator())
+            using var e1 = first.GetEnumerator();
+            using var e2 = second.GetEnumerator();
+            while (e1.MoveNext() && e2.MoveNext())
             {
-                while (e1.MoveNext() && e2.MoveNext())
-                {
-                    yield return e1.Current;
-                    yield return e2.Current;
-                }
+                yield return e1.Current;
+                yield return e2.Current;
             }
         }
     }
@@ -24,7 +22,7 @@ namespace Symirror3.Core
     public static class PolyhedronUtilities
     {
         // キラル多面体のアポロニウス点は決め打ち。自動計算できるようにしたいが存在しない構成もあるので微妙
-        private static Dictionary<SymmetrySymbol, (double x, double y, double z)> SnubPoints = new()
+        private static readonly Dictionary<SymmetrySymbol, (double x, double y, double z)> SnubPoints = new()
         {
             [new( 2    ,  3    ,  3    )] = (0.371197164, 0.371198600, 0.851132452),
             [new( 2    , (3, 2), (3, 2))] = (0.601587057, 0.603128135, 0.523770750),
@@ -51,7 +49,7 @@ namespace Symirror3.Core
             [new( 2    ,  2    , (7, 4))] = (0.674680300, 0.504504740, 0.538780570),
         };
 
-        private static HashSet<SymmetrySymbol> DirhombicSymbols = new()
+        private static readonly HashSet<SymmetrySymbol> DirhombicSymbols = new()
         {
             new(2,  3    , (5, 2)),
             new(2,  3    , (5, 3)),
