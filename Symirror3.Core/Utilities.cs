@@ -57,7 +57,7 @@ namespace Symirror3.Core
             new(2, (3, 2), (5, 3)),
         };
 
-        public static bool TryGetSnubPoint(SymmetrySymbol symbol, [NotNullWhen(true)] out SphericalPoint result)
+        public static bool TryGetSnubPoint(this SymmetrySymbol symbol, [NotNullWhen(true)] out SphericalPoint result)
         {
             if (SnubPoints.TryGetValue(symbol, out var p))
             {
@@ -71,7 +71,7 @@ namespace Symirror3.Core
             }
         }
 
-        public static bool TryGetDirhombicPoint(SymmetrySymbol symbol, [NotNullWhen(true)] out SphericalPoint result)
+        public static bool TryGetDirhombicPoint(this SymmetrySymbol symbol, [NotNullWhen(true)] out SphericalPoint result)
         {
             if (DirhombicSymbols.Contains(symbol))
             {

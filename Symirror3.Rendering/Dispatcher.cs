@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
+using Symirror3.Core;
 using Symirror3.Core.Polyhedrons;
 using Symirror3.Core.Symmetry;
-using Symirror3.Core;
 using IndirectX;
 
 namespace Symirror3.Rendering

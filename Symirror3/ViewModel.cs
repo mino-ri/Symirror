@@ -128,22 +128,18 @@ namespace Symirror3
         public void MoveBasePointToBisectorCross(object? arg)
         {
             var index = Math.Clamp(ParseInt(arg), 0, 2);
-            var face = _dispatcher.Symmetry.Faces[0];
-            var point = face.GetBisectorCross(index);
+            var point = _dispatcher.Symmetry.Faces[0].GetBisectorCross(index);
             _dispatcher.SendMessage(new MoveBasePointTo(point));
         }
 
         public ICommand MoveBasePointToIncenterCommand { get; }
         public void MoveBasePointToIncenter(object? _)
         {
-            var face = _dispatcher.Symmetry.Faces[0];
             var point = PolyhedronType.Value switch
             {
-                PType.Snub or PType.SnubDual
-                    when PolyhedronUtilities.TryGetSnubPoint(Symbol, out var p) => p,
-                PType.Dirhombic
-                    when PolyhedronUtilities.TryGetDirhombicPoint(Symbol, out var p) => p,
-                _ => face.GetIncenter(),
+                PType.Snub or PType.SnubDual when Symbol.TryGetSnubPoint(out var p) => p,
+                PType.Dirhombic when Symbol.TryGetDirhombicPoint(out var p) => p,
+                _ => _dispatcher.Symmetry.Faces[0].GetIncenter(),
             };
             _dispatcher.SendMessage(new MoveBasePointTo(point));
         }

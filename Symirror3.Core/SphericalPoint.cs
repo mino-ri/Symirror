@@ -6,6 +6,8 @@ namespace Symirror3.Core
 {
     public struct SphericalPoint : IEquatable<SphericalPoint>
     {
+        public const double DefaultError = 1.0 / 8192.0;
+
         public double X;
         public double Y;
         public double Z;
@@ -18,15 +20,15 @@ namespace Symirror3.Core
 
         public readonly double Polar => Math.Atan2(Y, X);
 
-        public readonly bool IsValid => 1.0 - VectorOperator.DefaultError <= LengthSquared &&
-                                        LengthSquared <= 1.0 + VectorOperator.DefaultError;
+        public readonly bool IsValid => 1.0 - DefaultError <= LengthSquared &&
+                                        LengthSquared <= 1.0 + DefaultError;
 
         public SphericalPoint(double x, double y, double z) => (X, Y, Z) = (x, y, z);
 
         public static SphericalPoint Normalize(double x, double y, double z)
         {
             var length = x * x + y * y + z * z;
-            if (1.0 - VectorOperator.DefaultError <= length && length <= 1.0 + VectorOperator.DefaultError)
+            if (1.0 - DefaultError <= length && length <= 1.0 + DefaultError)
                 return new SphericalPoint(x, y, z);
             length = Math.Sqrt(length);
             return new SphericalPoint(x / length, y / length, z / length);
@@ -66,7 +68,7 @@ namespace Symirror3.Core
 
         public static double Distance(in SphericalPoint a, in SphericalPoint b) => Math.Acos(Dot(in a, in b));
 
-        public static bool NearlyEqual(in SphericalPoint a, in SphericalPoint b, double error = VectorOperator.DefaultError) =>
+        public static bool ApproximatelyEqual(in SphericalPoint a, in SphericalPoint b, double error = DefaultError) =>
             Math.Abs(a.X - b.X) < error &&
             Math.Abs(a.Y - b.Y) < error &&
             Math.Abs(a.Z - b.Z) < error;

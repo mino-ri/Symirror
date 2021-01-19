@@ -121,7 +121,7 @@ namespace Symirror3.Core.Symmetry
                     .Reverse(newFace[reverseIndex].Point);
 
                 // 同一とみなせる頂点を探す
-                if (_vertices.Keys.FirstOrDefault(v => v.ElementType == reverseIndex && SphericalPoint.NearlyEqual(v.Point, vector)) is { } vertex)
+                if (_vertices.Keys.FirstOrDefault(v => v.ElementType == reverseIndex && SphericalPoint.ApproximatelyEqual(v.Point, vector)) is { } vertex)
                 {
                     newFace[reverseIndex] = vertex;
                     // 見付かった頂点にこれ以上辺を追加できないか、同一の面が存在する場合

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using IndirectX;
 using Symirror3.Core.Polyhedrons;
 using Symirror3.Core.Symmetry;
+using IndirectX;
 
 namespace Symirror3.Rendering
 {
@@ -33,12 +33,12 @@ namespace Symirror3.Rendering
 
         protected abstract void RenderCore(PolyhedronFace<Vector3> polygon, Graphics graphics);
 
-        private float GetDefuseFactor(Vector3 normal, Vector3 light)
+        private static float GetDefuseFactor(Vector3 normal, Vector3 light)
         {
             return Math.Max(0f, Vector3.Dot(normal, light));
         }
 
-        private float GetSpeculaFactor(Vector3 normal, Vector3 light, Vector3 sight)
+        private static float GetSpeculaFactor(Vector3 normal, Vector3 light, Vector3 sight)
         {
             var half = Vector3.Normalize(light + sight);
             return (float)Math.Pow(Math.Max(0, Vector3.Dot(normal, half)), 5);
@@ -96,7 +96,7 @@ namespace Symirror3.Rendering
 
         /// <summary>ポリゴンの法線ベクトルを取得します。</summary>
         /// <param name="polygon">法線ベクトルを取得するポリゴン。</param>
-        protected Vector3 GetNormal(PolyhedronFace<Vector3> polygon, Graphics graphics)
+        protected static Vector3 GetNormal(PolyhedronFace<Vector3> polygon, Graphics graphics)
         {
             if (polygon.Vertices.Length <= 4)
             {
@@ -114,7 +114,7 @@ namespace Symirror3.Rendering
 
         /// <summary>指定された対称性要素に割り当てられた色を取得します。</summary>
         /// <param name="symmetryElement">色を取得する対称性要素</param>
-        protected Color GetBaseColor(ISymmetryElement symmetryElement)
+        protected static Color GetBaseColor(ISymmetryElement symmetryElement)
         {
             return symmetryElement.ElementCategory == SymmetryElementCategory.Face
                 ? Colors[(symmetryElement.ElementType + 3) % Colors.Length]

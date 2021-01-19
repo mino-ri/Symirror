@@ -16,13 +16,13 @@ namespace Symirror3.Core.Numerics
         /// <summary>Z座標。</summary>
         public readonly float Z;
 
-        public float Magnitude => (float)Math.Sqrt(X * X + Y * Y + Z * Z);
+        public float Length => (float)Math.Sqrt(X * X + Y * Y + Z * Z);
 
         public Vector3F Normalize()
         {
-            var mag = Magnitude;
+            var mag = Length;
             if (mag == 0) return this;
-            return this / Magnitude;
+            return this / Length;
         }
 
         /// <summary><see cref="Vector3F"/>構造体の新しいインスタンスを生成します。</summary>

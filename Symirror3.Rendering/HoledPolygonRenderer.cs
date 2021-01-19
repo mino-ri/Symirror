@@ -24,7 +24,7 @@ namespace Symirror3.Rendering
             var latest = polygon.Vertices.Last().Vector;
             for (var i = 0; i < polygon.Vertices.Length; i++)
             {
-                if (!Vector3Operator.NearlyEqual(polygon.Vertices[i].Vector, latest, 1f / 256f))
+                if (!Vector3Operator.ApproximatelyEqual(polygon.Vertices[i].Vector, latest, 1f / 256f))
                 {
                     renderingList.Add(polygon.Vertices[i].Vector);
                     latest = polygon.Vertices[i].Vector;

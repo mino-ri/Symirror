@@ -14,7 +14,7 @@ namespace Symirror3.Rendering
             return vector - normal * (2f * Vector3.Dot(normal, vector));
         }
 
-        public static bool NearlyEqual(Vector3 x, Vector3 y, double error) =>
+        public static bool ApproximatelyEqual(Vector3 x, Vector3 y, double error) =>
             Math.Abs(x.X - y.X) < error &&
             Math.Abs(x.Y - y.Y) < error &&
             Math.Abs(x.Z - y.Z) < error;

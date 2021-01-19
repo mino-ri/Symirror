@@ -2,9 +2,9 @@
 using System.Numerics;
 using System.Linq;
 using IndirectX;
-using IndirectX.EasyRenderer;
-using IndirectX.D3D11;
 using IndirectX.Dxgi;
+using IndirectX.D3D11;
+using IndirectX.EasyRenderer;
 
 namespace Symirror3.Rendering
 {

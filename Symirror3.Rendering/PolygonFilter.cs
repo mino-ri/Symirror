@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using System.Linq;
+using System.Numerics;
 using Symirror3.Core.Polyhedrons;
 using Symirror3.Core.Symmetry;
 
@@ -9,8 +9,8 @@ namespace Symirror3.Rendering
 {
     public class PolygonFilter
     {
-        private bool[] _faceVisibles = new bool[] { true, true, true, true, true };
-        private bool[] _isShown = new bool[] { false, false, false, false, false };
+        private readonly bool[] _faceVisibles = new bool[] { true, true, true, true, true };
+        private readonly bool[] _isShown = new bool[] { false, false, false, false, false };
 
         private FaceViewType _faceViewType = FaceViewType.All;
         private Vector3 _targetVertex;
@@ -27,7 +27,7 @@ namespace Symirror3.Rendering
 
         public void HandleMessage(ChangeFaceViewType message) => _faceViewType = message.FaceViewType;
 
-        private int GetColorType(PolyhedronFace<Vector3> face) =>
+        private static int GetColorType(PolyhedronFace<Vector3> face) =>
             face.SymmetryElement.ElementCategory == SymmetryElementCategory.Face
                 ? (face.SymmetryElement.ElementType + 3) % 5
                 : face.SymmetryElement.ElementType % 5;
@@ -58,10 +58,8 @@ namespace Symirror3.Rendering
               .Where(face =>
               {
                   var colorType = GetColorType(face);
-                  return _faceViewType == FaceViewType.VertexFigure &&
-                    face.Vertices.All(v => !Vector3Operator.NearlyEqual(_targetVertex, v.Vector, 1f / 32f))
-                      ? false
-                      : _faceVisibles[colorType];
+                  return _faceVisibles[colorType] && (_faceViewType != FaceViewType.VertexFigure ||
+                    face.Vertices.Any(v => Vector3Operator.ApproximatelyEqual(_targetVertex, v.Vector, 1f / 32f)));
               });
         }
     }
