@@ -11,8 +11,8 @@
         /// <summary>零ベクトルを取得します。</summary>
         T Zero { get; }
 
-        public T Convert(SphericalPoint point) => Create(point.X, point.Y, point.Z);
+        public T Convert(in SphericalPoint point) => Create(point.X, point.Y, point.Z);
 
-        public T Convert(Numerics.Vector3D point) => Create(point.X, point.Y, point.Z);
+        public T Convert(in Numerics.Vector3D point) => Create(point.X, point.Y, point.Z);
     }
 }
