@@ -60,7 +60,7 @@ namespace Symirror3.Core.Polyhedrons
             for (var i = 0; i < 3; i++)
                 ard[i] = polygon.Edge((i + 2) % 3).Reverse(snubPoint);
 
-            var normal = SphericalPoint.Normalize((ard[1] - ard[0]) % (ard[2] - ard[0]));
+            var normal = SphericalPoint.Normalize(Numerics.Vector3D.Cross(ard[1] - ard[0], ard[2] - ard[0]));
 
             // カタランの立体と同じ位置にある頂点の距離
             var distances = polygon.Select(v => SphericalPoint.GetCrossPoint(v.Point, normal, ard[0])).ToArray();
@@ -88,7 +88,7 @@ namespace Symirror3.Core.Polyhedrons
                 var copyDef = CopyDifinitions[i - 1];
                 var source = copyDef.Source;
                 var edge = copyDef.ReverseEdge;
-                Vertices[i].Vector = Symmetry[source].Edge(edge).Reverse(Vertices[source].Vector, _opr);
+                Vertices[i].Vector = _opr.Reverse(Vertices[source].Vector, Symmetry[source].Edge(edge));
             }
         }
     }

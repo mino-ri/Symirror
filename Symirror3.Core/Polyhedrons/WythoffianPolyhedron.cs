@@ -21,8 +21,8 @@ namespace Symirror3.Core.Polyhedrons
             for (int i = 1; i < Vertices.Length; i++)
             {
                 var copyDef = CopyDifinitions[i - 1];
-                Vertices[i].Vector = Symmetry[copyDef.Source].Edge(copyDef.ReverseEdge)
-                    .Reverse(Vertices[copyDef.Source].Vector, _opr);
+                Vertices[i].Vector = _opr.Reverse(Vertices[copyDef.Source].Vector,
+                    Symmetry[copyDef.Source].Edge(copyDef.ReverseEdge));
             }
         }
 

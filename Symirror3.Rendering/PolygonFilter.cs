@@ -59,7 +59,7 @@ namespace Symirror3.Rendering
               {
                   var colorType = GetColorType(face);
                   return _faceViewType == FaceViewType.VertexFigure &&
-                    face.Vertices.All(v => !Vector3Operator.Instance.NearlyEqual(_targetVertex, v.Vector, 1f / 32f))
+                    face.Vertices.All(v => !Vector3Operator.NearlyEqual(_targetVertex, v.Vector, 1f / 32f))
                       ? false
                       : _faceVisibles[colorType];
               });

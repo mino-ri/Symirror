@@ -22,12 +22,6 @@ namespace Symirror3.Core
         public readonly SphericalPoint Reverse(in SphericalPoint point) =>
             (SphericalPoint)(point - Normal * (2.0 * SphericalPoint.Dot(in Normal, in point)));
 
-        public readonly T Reverse<T>(T vector, IVectorOperator<T> opr)
-        {
-            var n = opr.Convert(Normal);
-            return opr.Subtract(vector, opr.Multiply(n, 2.0 * opr.Dot(n, vector)));
-        }
-
         public static double Angle(in SphericalRing a, in SphericalRing b) =>
             SphericalPoint.Distance(in a.Normal, in b.Normal);
 

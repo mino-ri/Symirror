@@ -43,6 +43,12 @@ namespace Symirror3.Core.Numerics
 
         public override int GetHashCode() => (X, Y, Z).GetHashCode();
 
+        /// <summary>ベクトルの内積を求めます。</summary>
+        public static float Dot(Vector3F a, Vector3F b) => a.X * b.X + a.Y * b.Y + a.Z * b.Z;
+
+        /// <summary>ベクトルの外積を求めます。</summary>
+        public static Vector3F Cross(Vector3F a, Vector3F b) => new(a.Y * b.Z - a.Z * b.Y, a.Z * b.X - a.X * b.Z, a.X * b.Y - a.Y * b.X);
+
         /// <summary>ベクトルの符号を反転します。</summary>
         public static Vector3F operator -(Vector3F a) => new(-a.X, -a.Y, -a.Z);
 
@@ -61,12 +67,6 @@ namespace Symirror3.Core.Numerics
         /// <summary>ベクトルのスカラー除を求めます。</summary>
         public static Vector3F operator /(Vector3F a, float s) => new(a.X / s, a.Y / s, a.Z / s);
 
-        /// <summary>ベクトルの内積を求めます。</summary>
-        public static float operator *(Vector3F a, Vector3F b) => a.X * b.X + a.Y * b.Y + a.Z * b.Z;
-
-        /// <summary>ベクトルの外積を求めます。</summary>
-        public static Vector3F operator %(Vector3F a, Vector3F b) => new(a.Y * b.Z - a.Z * b.Y, a.Z * b.X - a.X * b.Z, a.X * b.Y - a.Y * b.X);
-
         /// <summary>ベクトルが等しいか判断します。</summary>
         public static bool operator ==(Vector3F left, Vector3F right) => left.Equals(right);
 
@@ -79,18 +79,11 @@ namespace Symirror3.Core.Numerics
         {
             public Vector3F Zero => default;
             public Vector3F Create(double x, double y, double z) => new((float)x, (float)y, (float)z);
-            public Vector3F Negate(Vector3F x) => -x;
-            public Vector3F Add(Vector3F x, Vector3F y) => x + y;
-            public Vector3F Subtract(Vector3F x, Vector3F y) => x - y;
-            public Vector3F Multiply(Vector3F x, double scalar) => x * (float)scalar;
-            public Vector3F Divide(Vector3F x, double scalar) => x / (float)scalar;
-            public double Dot(Vector3F x, Vector3F y) => x * y;
-            public Vector3F Cross(Vector3F x, Vector3F y) => x % y;
-            public Vector3F Normalize(Vector3F x) => x.Normalize();
-            public bool NearlyEqual(Vector3F x, Vector3F y, double error) =>
-                Math.Abs(x.X - y.X) < error &&
-                Math.Abs(x.Y - y.Y) < error &&
-                Math.Abs(x.Z - y.Z) < error;
+            public Vector3F Reverse(Vector3F vector, in SphericalRing ring)
+            {
+                var normal = (Vector3F)ring.Normal;
+                return vector - normal * (2f * Dot(normal, vector));
+            }
         }
     }
 }
