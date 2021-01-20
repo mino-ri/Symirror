@@ -23,7 +23,7 @@
                                MouseMove="DrawSuface_MouseMove"
                                MouseUp="DrawSuface_MouseUp" />
         </WindowsFormsHost>
-        <Canvas DockPanel.Dock="Bottom" Width="256" Height="256">
+        <Canvas DockPanel.Dock="Bottom" Width="256" Height="256" ClipToBounds="True">
             <Image Name="MapImage" Width="256" Height="256" Source="{Binding GeneratorMap}"
                    MouseDown="MapImage_MouseDown"
                    MouseMove="MapImage_MouseMove" />

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -36,9 +37,11 @@ namespace Symirror3
                 _triangle[1].Point - _triangle[0].Point, _triangle[2].Point - _triangle[0].Point));
             var origin = new SphericalPoint(0, 0, -1);
             _viewToModel = QuaternionD.FromAxisAngle(SphericalPoint.Cross(origin, normal), SphericalPoint.Distance(normal, origin));
-            var viewVertex0 = _viewToModel.Inverse() * _triangle[2].Point;
-            _viewToModel = _viewToModel * QuaternionD.RotationZ(Math.Atan2(viewVertex0.X, -viewVertex0.Y));
+            var viewVertex2 = _viewToModel.Inverse() * _triangle[2].Point;
+            _viewToModel *= QuaternionD.RotationZ(Math.Atan2(viewVertex2.X, -viewVertex2.Y));
             _modelToView = _viewToModel.Inverse();
+            _scale = 1.0;
+            _scale = ((Vector)ModelToView(_triangle[0].Point)).Length * 1.125;
 
             try
             {
@@ -108,11 +111,12 @@ namespace Symirror3
         {
             p = _modelToView * p;
             var d = 1.0 - p.Z;
-            return new Point(p.X / d, p.Y / d);
+            return new Point(p.X / d / _scale, p.Y / d / _scale);
         }
 
         public SphericalPoint ViewToModel(Point p)
         {
+            p = new Point(p.X * _scale, p.Y * _scale);
             var d = 1.0 + p.X * p.X + p.Y * p.Y;
             return _viewToModel * new SphericalPoint(2.0 * p.X / d, 2.0 * p.Y / d, (d - 2.0) / d);
         }
