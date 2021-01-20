@@ -98,15 +98,17 @@ namespace Symirror3.Core.Symmetry
             new(2, 2, 4),
             new(2, 2, F4_3),
             new(2, 2, 5),
+            new(2, 2, F5_4),
             new(2, 2, F5_2),
             new(2, 2, F5_3),
             new(2, 2, 6),
             new(2, 2, new(6, 5)),
             new(2, 2, 7),
+            new(2, 2, new(7, 6)),
             new(2, 2, new(7, 2)),
+            new(2, 2, new(7, 5)),
             new(2, 2, new(7, 3)),
             new(2, 2, new(7, 4)),
-            new(2, 2, new(7, 5)),
         };
     }
 }

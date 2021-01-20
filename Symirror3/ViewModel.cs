@@ -39,7 +39,7 @@ namespace Symirror3
                 if (SetValue(ref _symbol, value))
                 {
                     _dispatcher.SendMessage(new ChangeSymbol(_symbol, _polyhedronType.Value));
-                    _generatorMap.UpdateImage(SymmetryTriangle.Create(_symbol));
+                    _generatorMap.UpdateImage(SymmetryTriangle.Create(_symbol), _polyhedronType.Value);
                 }
             }
         }
@@ -80,7 +80,14 @@ namespace Symirror3
         public EnumValue<PType> PolyhedronType
         {
             get => _polyhedronType;
-            set => SetValue(ref _polyhedronType, value, v => new ChangePolyhedronType(v.Value));
+            set
+            {
+                if (SetValue(ref _polyhedronType, value))
+                {
+                    _dispatcher.SendMessage(new ChangePolyhedronType(_polyhedronType.Value));
+                    _generatorMap.UpdateImage(SymmetryTriangle.Create(_symbol), _polyhedronType.Value);
+                }
+            }
         }
 
         public EnumValue<FaceViewType>[] AllFaceViewTypes { get; }
@@ -187,7 +194,7 @@ namespace Symirror3
             MoveBasePointToIncenterCommand = new ActionCommand(MoveBasePointToIncenter);
 
             _viewDispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
-            _generatorMap = new GeneratorMap(mapSize, SymmetryTriangle.Create(_symbol));
+            _generatorMap = new GeneratorMap(mapSize, SymmetryTriangle.Create(_symbol), _polyhedronType.Value);
             _dispatcher = new Dispatcher(control.Handle, control.Width, control.Height, Symbol);
             _dispatcher.BasePointChanged += p => _viewDispatcher.Invoke(() =>
             {
