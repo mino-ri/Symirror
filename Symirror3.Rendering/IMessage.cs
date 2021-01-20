@@ -10,6 +10,8 @@ namespace Symirror3.Rendering
 
     public record MoveBasePoint(float RotateX, float RotateY) : IMessage;
 
+    public record ChangeBasePoint(SphericalPoint Point) : IMessage;
+
     public record MoveBasePointTo(SphericalPoint To) : IMessage;
 
     public record MoveBasePointFromTo(SphericalPoint From, SphericalPoint To, int FrameCount) : IMessage;

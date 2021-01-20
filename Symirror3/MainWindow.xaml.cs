@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows;
 using System.ComponentModel;
-using System.Windows.Forms;
 using System.Windows.Input;
-using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
+using System.Windows.Media;
+using Win32 = System.Windows.Forms;
 
 namespace Symirror3
 {
@@ -21,7 +21,8 @@ namespace Symirror3
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            viewModel = new ViewModel(drawSuface);
+            var dpi = VisualTreeHelper.GetDpi(MapImage);
+            viewModel = new ViewModel(drawSuface, (int)Math.Round(256.0 * dpi.DpiScaleX));
             DataContext = viewModel;
         }
 
@@ -37,23 +38,23 @@ namespace Symirror3
 
         int _oldX, _oldY;
         bool _pushing;
-        private void DrawSuface_MouseDown(object sender, MouseEventArgs e)
+        private void DrawSuface_MouseDown(object sender, Win32.MouseEventArgs e)
         {
             _pushing = true;
             _oldX = e.X;
             _oldY = e.Y;
         }
 
-        private void DrawSuface_MouseUp(object sender, MouseEventArgs e)
+        private void DrawSuface_MouseUp(object sender, Win32.MouseEventArgs e)
         {
             _pushing = false;
         }
 
-        private void DrawSuface_MouseMove(object sender, MouseEventArgs e)
+        private void DrawSuface_MouseMove(object sender, Win32.MouseEventArgs e)
         {
             if (_pushing)
             {
-                if (e.Button.HasFlag(MouseButtons.Right))
+                if (e.Button.HasFlag(Win32.MouseButtons.Right))
                 {
                     viewModel.MoveBasePoint(_oldX - e.X, _oldY - e.Y);
                 }
@@ -71,5 +72,22 @@ namespace Symirror3
             }
         }
 
+        private void MapImage_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                var p = e.GetPosition(MapImage);
+                viewModel.ChangeBasePoint(new Point(p.X / 128.0 - 1.0, p.Y / 128.0 - 1.0));
+            }
+        }
+
+        private void MapImage_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {   
+                var p = e.GetPosition(MapImage);
+                viewModel.ChangeBasePoint(new Point(p.X / 128.0 - 1.0, p.Y / 128.0 - 1.0));
+            }
+        }
     }
 }

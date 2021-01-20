@@ -98,11 +98,11 @@ namespace Symirror3.Core.Symmetry
         /// <param name="b">ワイソフ記号の1要素を表す分数。</param>
         /// <param name="c">ワイソフ記号の1要素を表す分数。</param>
         /// <param name="createVector">ベクトルのインスタンスを生成する関数。</param>
-        internal static SymmetryTriangle CreateTrianglCore(Fraction a, Fraction b, Fraction c)
+        public static SymmetryTriangle Create(SymmetrySymbol symbol)
         {
-            var angleA = PI / a;
-            var angleB = PI / b;
-            var angleC = PI / c;
+            var angleA = PI / symbol.F0;
+            var angleB = PI / symbol.F1;
+            var angleC = PI / symbol.F2;
 
             var cosB = OppositeCos(angleB, angleA, angleC);
             var cosC = OppositeCos(angleC, angleA, angleB);

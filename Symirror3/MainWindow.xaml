@@ -23,13 +23,38 @@
                                MouseMove="DrawSuface_MouseMove"
                                MouseUp="DrawSuface_MouseUp" />
         </WindowsFormsHost>
-        <ComboBox DockPanel.Dock="Bottom" Margin="4" ItemsSource="{Binding AllLanguages,Mode=OneTime}"
-                  SelectedItem="{Binding Language,Mode=TwoWay}" />
-        <StackPanel Orientation="Vertical" Width="120" Margin="4">
+        <Canvas DockPanel.Dock="Bottom" Width="256" Height="256">
+            <Image Name="MapImage" Width="256" Height="256" Source="{Binding GeneratorMap}"
+                   MouseDown="MapImage_MouseDown"
+                   MouseMove="MapImage_MouseMove" />
+            <Ellipse Width="4" Height="4" Margin="-2"
+                     Canvas.Left="{Binding BaseX, Mode=OneWay}"
+                     Canvas.Top="{Binding BaseY, Mode=OneWay}"
+                     Fill="{x:Static Brushes.White}"
+                     Stroke="{x:Static Brushes.Black}"
+                     StrokeThickness="1" />
+        </Canvas>
+        <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="120" Margin="4">
             <TextBlock Text="{Binding Path=Language.Texts[Symmetry],Mode=OneWay}" />
             <ComboBox ItemsSource="{Binding AllSymbols, Mode=OneTime}" SelectedValue="{Binding Symbol}" Margin="0,3" />
             <TextBlock Text="{Binding Path=Language.Texts[PolyhedronType],Mode=OneWay}" />
             <ComboBox ItemsSource="{Binding AllPolyhedronTypes, Mode=OneTime}" SelectedValue="{Binding PolyhedronType}" DisplayMemberPath="ViewText" Margin="0,3" />
+            <CheckBox Content="{Binding Path=Language.Texts[AutoRotation],Mode=OneWay}" IsChecked="{Binding AutoRotation}" Margin="0,3"/>
+            <Button Content="{Binding Path=Language.Texts[ResetRotation],Mode=OneWay}" Command="{Binding ResetRotationCommand}" Margin="4,3,4,0" />
+            <Canvas Width="112" Height="100">
+                <Polygon Points="56,15 10,90 102,90, 56,15" Stroke="Orange" StrokeThickness="2"/>
+                <Button Width="32" Height="24" Canvas.Left="40" Canvas.Top="11" CommandParameter="2" Command="{Binding MoveBasePointToVertexCommand, Mode=OneTime}" Content="{Binding Symbol[2], Mode=OneWay}" />
+                <Button Width="32" Height="24" Canvas.Left="2"  Canvas.Top="78" CommandParameter="0" Command="{Binding MoveBasePointToVertexCommand, Mode=OneTime}" Content="{Binding Symbol[0], Mode=OneWay}" />
+                <Button Width="32" Height="24" Canvas.Left="78" Canvas.Top="78" CommandParameter="1" Command="{Binding MoveBasePointToVertexCommand, Mode=OneTime}" Content="{Binding Symbol[1], Mode=OneWay}" />
+                <Button Width="24" Height="24" Canvas.Left="17" Canvas.Top="44" CommandParameter="1" Command="{Binding MoveBasePointToBisectorCrossCommand, Mode=OneTime}" />
+                <Button Width="24" Height="24" Canvas.Left="44" Canvas.Top="78" CommandParameter="2" Command="{Binding MoveBasePointToBisectorCrossCommand, Mode=OneTime}" />
+                <Button Width="24" Height="24" Canvas.Left="71" Canvas.Top="44" CommandParameter="0" Command="{Binding MoveBasePointToBisectorCrossCommand, Mode=OneTime}" />
+                <Button Width="24" Height="24" Canvas.Left="44" Canvas.Top="50" CommandParameter="0" Command="{Binding MoveBasePointToIncenterCommand, Mode=OneTime}" />
+            </Canvas>
+        </StackPanel>
+        <ComboBox DockPanel.Dock="Bottom" Margin="4" ItemsSource="{Binding AllLanguages,Mode=OneTime}"
+                SelectedItem="{Binding Language,Mode=TwoWay}" />
+        <StackPanel Orientation="Vertical" Width="120" Margin="4">
             <GroupBox Header="{Binding Path=Language.Texts[FacesVisiblility],Mode=OneWay}" Margin="0,2">
                 <StackPanel Orientation="Vertical">
                     <Grid>
@@ -74,18 +99,6 @@
                 <Run Text="{Binding Path=Language.Texts[ShadowFactor],Mode=OneWay}"/><Run Text="{Binding Shadow,Mode=OneWay}"/>
             </TextBlock>
             <Slider Minimum="0" Maximum="100" Value="{Binding Shadow}" IsSnapToTickEnabled="True" TickFrequency="1" />
-            <CheckBox Content="{Binding Path=Language.Texts[AutoRotation],Mode=OneWay}" IsChecked="{Binding AutoRotation}" Margin="0,3"/>
-            <Button Content="{Binding Path=Language.Texts[ResetRotation],Mode=OneWay}" Command="{Binding ResetRotationCommand}" Margin="4,3,4,0" />
-            <Canvas Width="112" Height="100">
-                <Polygon Points="56,15 10,90 102,90, 56,15" Stroke="Orange" StrokeThickness="2"/>
-                <Button Width="32" Height="24" Canvas.Left="40" Canvas.Top="11" CommandParameter="0" Command="{Binding MoveBasePointToVertexCommand, Mode=OneTime}" Content="{Binding Symbol[0], Mode=OneWay}" />
-                <Button Width="32" Height="24" Canvas.Left="2"  Canvas.Top="78" CommandParameter="1" Command="{Binding MoveBasePointToVertexCommand, Mode=OneTime}" Content="{Binding Symbol[1], Mode=OneWay}" />
-                <Button Width="32" Height="24" Canvas.Left="78" Canvas.Top="78" CommandParameter="2" Command="{Binding MoveBasePointToVertexCommand, Mode=OneTime}" Content="{Binding Symbol[2], Mode=OneWay}" />
-                <Button Width="24" Height="24" Canvas.Left="17" Canvas.Top="44" CommandParameter="2" Command="{Binding MoveBasePointToBisectorCrossCommand, Mode=OneTime}" />
-                <Button Width="24" Height="24" Canvas.Left="44" Canvas.Top="78" CommandParameter="0" Command="{Binding MoveBasePointToBisectorCrossCommand, Mode=OneTime}" />
-                <Button Width="24" Height="24" Canvas.Left="71" Canvas.Top="44" CommandParameter="1" Command="{Binding MoveBasePointToBisectorCrossCommand, Mode=OneTime}" />
-                <Button Width="24" Height="24" Canvas.Left="44" Canvas.Top="50" CommandParameter="0" Command="{Binding MoveBasePointToIncenterCommand, Mode=OneTime}" />
-            </Canvas>
         </StackPanel>
     </DockPanel>
 </Window>

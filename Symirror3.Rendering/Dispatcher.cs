@@ -32,6 +32,8 @@ namespace Symirror3.Rendering
 
         public SymmetryGroup Symmetry => _polyhedronSelector.Symmetry;
 
+        public event Action<SphericalPoint>? BasePointChanged;
+
         public Dispatcher(IntPtr surfaceHandle, int width, int height, SymmetrySymbol symbol)
         {
             _graphics = new Graphics(surfaceHandle, width, height);
@@ -40,6 +42,12 @@ namespace Symirror3.Rendering
             _renderer = new StandardPolygonRenderer();
             _filter = new PolygonFilter();
             _renderer.OnActivate(_graphics);
+        }
+
+        private void ChangeBasePoint(in SphericalPoint p)
+        {
+            _polyhedron.BasePoint = p;
+            BasePointChanged?.Invoke(p);
         }
 
         public void SendMessage(IMessage message)
@@ -137,7 +145,12 @@ namespace Symirror3.Rendering
                 var cos = MathF.Cos(msg.RotateY * -MoveDelta);
                 (p.Y, p.Z) = (p.Y * cos - p.Z * sin, p.Z * cos + p.Y * sin);
             }
-            _polyhedron.BasePoint = p;
+            ChangeBasePoint(p);
+        }
+
+        private void HandleMessageCore(ChangeBasePoint msg)
+        {
+            ChangeBasePoint(msg.Point);
         }
 
         private void HandleMessageCore(MoveBasePointTo msg)
@@ -146,7 +159,7 @@ namespace Symirror3.Rendering
             var distance = Math.Acos(Math.Clamp(SphericalPoint.Dot(_polyhedron.BasePoint, msg.To), -1.0, 1.0));
             if (distance <= Math.PI / 180.0)
             {
-                _polyhedron.BasePoint = msg.To;
+                ChangeBasePoint(msg.To);
                 return;
             }
             var frameCount = Math.Max(40, (int)(distance / Math.PI * 180));
@@ -158,7 +171,7 @@ namespace Symirror3.Rendering
             if (HasTask<MoveBasePointFromTo>()) return;
             StartCountTask(msg, msg.FrameCount, (m, count) =>
             {
-                _polyhedron.BasePoint = SphericalPoint.Lerp(m.To, m.From, (double)count / m.FrameCount);
+                ChangeBasePoint(SphericalPoint.Lerp(m.To, m.From, (double)count / m.FrameCount));
             });
         }
 
@@ -211,7 +224,11 @@ namespace Symirror3.Rendering
             HandleMessageCore(new ChangePolyhedronType(msg.PolyhedronType));
         }
 
-        private void HandleMessageCore(ChangePolyhedronType msg) => _polyhedron = _polyhedronSelector.GetPolyhedron(msg.PolyhedronType);
+        private void HandleMessageCore(ChangePolyhedronType msg)
+        {
+            _polyhedron = _polyhedronSelector.GetPolyhedron(msg.PolyhedronType);
+            BasePointChanged?.Invoke(_polyhedron.BasePoint);
+        }
 
         private void HandleMessageCore(ChangeFaceVisible msg) => _filter.HandleMessage(msg);
 

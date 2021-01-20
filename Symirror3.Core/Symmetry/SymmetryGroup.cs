@@ -85,7 +85,7 @@ namespace Symirror3.Core.Symmetry
 
             public Builder(SymmetrySymbol symbol)
             {
-                var firstFace = SymmetryTriangle.CreateTrianglCore(symbol.F0, symbol.F1, symbol.F2);
+                var firstFace = SymmetryTriangle.Create(symbol);
                 _symbol = symbol;
                 _faceCounts = _symbol.Select(s => s.Numerator * 2).ToArray();
                 _faces = new() { firstFace };

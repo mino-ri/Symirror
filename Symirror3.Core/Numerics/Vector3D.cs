@@ -16,7 +16,9 @@ namespace Symirror3.Core.Numerics
         /// <summary>Z座標。</summary>
         public readonly double Z;
 
-        public double Length => Math.Sqrt(X * X + Y * Y + Z * Z);
+        public double LengthSquared => X * X + Y * Y + Z * Z;
+
+        public double Length => Math.Sqrt(LengthSquared);
 
         public Vector3D Normalize()
         {
