@@ -137,11 +137,15 @@ namespace Symirror3
 
         public void Rotate(float x, float y, float z) => _dispatcher.SendMessage(new Rotate(x, y, z));
 
-        public void MoveBasePoint(double x, double y)
+        public void MoveBasePointRelative(double x, double y)
         {
-            var point = new Point(BaseX / 128.0 - 1.0 - x / 1024.0, BaseY / 128.0 - 1.0 - y / 1024.0);
+            var point = new Point(BaseX / 128.0 - 1.0 - x / 512, BaseY / 128.0 - 1.0 - y / 512);
             _dispatcher.SendMessage(new ChangeBasePoint(_generatorMap.ViewToModel(point)));
-            // _dispatcher.SendMessage(new MoveBasePoint(x, y));
+        }
+
+        public void MoveBasePointTo(Point point)
+        {
+            _dispatcher.SendMessage(new MoveBasePointTo(_generatorMap.ViewToModel(point)));
         }
 
         public void ChangeBasePoint(Point point)

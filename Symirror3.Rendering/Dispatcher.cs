@@ -182,7 +182,7 @@ namespace Symirror3.Rendering
             if (msg.RotateY != 0f)
                 _graphics.World *= Matrix4.RotationX(msg.RotateY * -RotationDelta);
             if (msg.RotateZ != 0f)
-                _graphics.World *= Matrix4.RotationZ(msg.RotateZ * RotationDelta);
+                _graphics.World *= Matrix4.RotationZ(msg.RotateZ * -RotationDelta);
             _graphics.FlushWorld();
         }
 

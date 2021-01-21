@@ -26,14 +26,17 @@
         <Canvas DockPanel.Dock="Bottom" Width="256" Height="256" ClipToBounds="True">
             <Image Name="MapImage" Width="256" Height="256" Source="{Binding GeneratorMap}"
                    MouseDown="MapImage_MouseDown"
+                   MouseUp="MapImage_MouseUp"
                    MouseMove="MapImage_MouseMove" />
-            <Ellipse Width="4" Height="4" Margin="-2"
+            <Ellipse Width="6" Height="6" Margin="-3"
                      Canvas.Left="{Binding BaseX, Mode=OneWay}"
                      Canvas.Top="{Binding BaseY, Mode=OneWay}"
                      Fill="{x:Static Brushes.White}"
                      Stroke="{x:Static Brushes.Black}"
                      StrokeThickness="1"
-                     IsHitTestVisible="False" />
+                     IsHitTestVisible="False"
+                     SnapsToDevicePixels="False"
+                     UseLayoutRounding="False" />
         </Canvas>
         <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="120" Margin="4">
             <TextBlock Text="{Binding Path=Language.Texts[Symmetry],Mode=OneWay}" />
