@@ -18,17 +18,19 @@ namespace Symirror3
         private double _scale;
         private PolyhedronType _polyhedronType;
         private readonly WriteableBitmap _bitmap;
-        private readonly int _size;
+        private readonly int _screenSize;
         private readonly int _halfSize;
+        private readonly double _dpiHalfSize;
 
         public ImageSource ImageSource => _bitmap;
 
-        public GeneratorMap(int size, SymmetryTriangle triangle, PolyhedronType polyhedronType)
+        public GeneratorMap(double size, double dpiScale, SymmetryTriangle triangle, PolyhedronType polyhedronType)
         {
             _triangle = null!;
-            _size = size;
-            _halfSize = _size / 2;
-            _bitmap = new WriteableBitmap(_size, _size, 96.0, 96.0, PixelFormats.Pbgra32, null);
+            _dpiHalfSize = size / 2;
+            _screenSize = (int)Math.Round(size * dpiScale);
+            _halfSize = _screenSize / 2;
+            _bitmap = new WriteableBitmap(_screenSize, _screenSize, 96.0, 96.0, PixelFormats.Pbgra32, null);
             UpdateImage(triangle, polyhedronType);
         }
 
@@ -75,8 +77,8 @@ namespace Symirror3
                 SphericalPoint mp, reversed0, reversed1, reversed2;
                 double distance0, distance1, distance2;
                 uint color, addingFactor;
-                for (var y = 0; y < _size; y++)
-                    for (var x = 0; x < _size; x++)
+                for (var y = 0; y < _screenSize; y++)
+                    for (var x = 0; x < _screenSize; x++)
                     {
                         var sp = new Point(x / (double)_halfSize - 1.0, y / (double)_halfSize - 1.0);
                         if (((Vector)sp).LengthSquared >= 1.0)
@@ -119,8 +121,8 @@ namespace Symirror3
                 };
                 SphericalPoint mp;
                 uint color, addingFactor;
-                for (var y = 0; y < _size; y++)
-                    for (var x = 0; x < _size; x++)
+                for (var y = 0; y < _screenSize; y++)
+                    for (var x = 0; x < _screenSize; x++)
                     {
                         var sp = new Point(x / (double)_halfSize - 1.0, y / (double)_halfSize - 1.0);
                         if (((Vector)sp).LengthSquared >= 1.0)
@@ -156,11 +158,27 @@ namespace Symirror3
             return new Point(p.X / d / _scale, p.Y / d / _scale);
         }
 
+        public Point ModelToDpi(in SphericalPoint p)
+        {
+            var vp = ModelToView(p);
+            return new Point((vp.X + 1.0) * _dpiHalfSize, (vp.Y + 1.0) * _dpiHalfSize);
+        }
+
         public SphericalPoint ViewToModel(Point p)
         {
             p = new Point(p.X * _scale, p.Y * _scale);
             var d = 1.0 + p.X * p.X + p.Y * p.Y;
             return _viewToModel * new SphericalPoint(2.0 * p.X / d, 2.0 * p.Y / d, (d - 2.0) / d);
+        }
+
+        public SphericalPoint ScreenToModel(Point p)
+        {
+            return ViewToModel(new Point(p.X / _halfSize - 1.0, p.Y / _halfSize - 1.0));
+        }
+
+        public SphericalPoint DpiToModel(Point p)
+        {
+            return ViewToModel(new Point(p.X / _dpiHalfSize - 1.0, p.Y / _dpiHalfSize - 1.0));
         }
     }
 }

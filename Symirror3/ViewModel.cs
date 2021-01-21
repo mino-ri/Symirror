@@ -139,18 +139,18 @@ namespace Symirror3
 
         public void MoveBasePointRelative(double x, double y)
         {
-            var point = new Point(BaseX / 128.0 - 1.0 - x / 512, BaseY / 128.0 - 1.0 - y / 512);
-            _dispatcher.SendMessage(new ChangeBasePoint(_generatorMap.ViewToModel(point)));
+            var point = new Point(BaseX - x / 4, BaseY - y / 4);
+            _dispatcher.SendMessage(new ChangeBasePoint(_generatorMap.DpiToModel(point)));
         }
 
         public void MoveBasePointTo(Point point)
         {
-            _dispatcher.SendMessage(new MoveBasePointTo(_generatorMap.ViewToModel(point)));
+            _dispatcher.SendMessage(new MoveBasePointTo(_generatorMap.DpiToModel(point)));
         }
 
         public void ChangeBasePoint(Point point)
         {
-            _dispatcher.SendMessage(new ChangeBasePoint(_generatorMap.ViewToModel(point)));
+            _dispatcher.SendMessage(new ChangeBasePoint(_generatorMap.DpiToModel(point)));
         }
 
         public ICommand ResetRotationCommand { get; }
@@ -184,7 +184,7 @@ namespace Symirror3
             _dispatcher.SendMessage(new MoveBasePointTo(point));
         }
 
-        public ViewModel(Win32Control control, int mapSize)
+        public ViewModel(Win32Control control, double mapSize, double dpiScale)
         {
             AllPolyhedronTypes = GetEnums<PType>();
             _polyhedronType = AllPolyhedronTypes[1];
@@ -198,13 +198,13 @@ namespace Symirror3
             MoveBasePointToIncenterCommand = new ActionCommand(MoveBasePointToIncenter);
 
             _viewDispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
-            _generatorMap = new GeneratorMap(mapSize, SymmetryTriangle.Create(_symbol), _polyhedronType.Value);
+            _generatorMap = new GeneratorMap(mapSize, dpiScale, SymmetryTriangle.Create(_symbol), _polyhedronType.Value);
             _dispatcher = new Dispatcher(control.Handle, control.Width, control.Height, Symbol);
             _dispatcher.BasePointChanged += p => _viewDispatcher.Invoke(() =>
             {
-                var vp = _generatorMap.ModelToView(p);
-                BaseX = (vp.X + 1.0) * 128.0;
-                BaseY = (vp.Y + 1.0) * 128.0;
+                var vp = _generatorMap.ModelToDpi(p);
+                BaseX = vp.X;
+                BaseY = vp.Y;
             });
             _dispatcher.SendMessage(new ChangeSymbol(Symbol, PolyhedronType.Value));
             _dispatcher.SendMessage(new ChangeLight(Light, Shadow));
