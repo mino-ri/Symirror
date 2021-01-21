@@ -135,7 +135,7 @@ namespace Symirror3
 
         public ImageSource GeneratorMap => _generatorMap.ImageSource;
 
-        public void Rotate(float x, float y, float z) => _dispatcher.SendMessage(new Rotate(x, y, z));
+        public void Rotate(double x, double y, double z) => _dispatcher.SendMessage(new Rotate((float)x, (float)y, (float)z));
 
         public void MoveBasePointRelative(double x, double y)
         {

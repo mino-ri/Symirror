@@ -18,16 +18,15 @@
     <DockPanel>
         <WindowsFormsHost Width="512" Height="512" DockPanel.Dock="Left" Background="Black"
                           Cursor="SizeAll">
-            <local:DirectXHost Width="512" Height="512" x:Name="drawSuface"
-                               MouseDown="DrawSuface_MouseDown"
-                               MouseMove="DrawSuface_MouseMove"
-                               MouseUp="DrawSuface_MouseUp" />
+            <local:DirectXHost Width="512" Height="512" x:Name="drawSuface" />
         </WindowsFormsHost>
         <Canvas DockPanel.Dock="Bottom" Width="256" Height="256" ClipToBounds="True">
-            <Image Name="MapImage" Width="256" Height="256" Source="{Binding GeneratorMap}"
-                   MouseDown="MapImage_MouseDown"
-                   MouseUp="MapImage_MouseUp"
-                   MouseMove="MapImage_MouseMove" />
+            <Image Name="MapImage" Width="256" Height="256" Source="{Binding GeneratorMap}">
+                <local:MouseGestureHandler.AttachedHandler>
+                    <local:MouseGestureHandler MouseClick="MapImage_MouseClick"
+                                               MouseDrag="MapImage_MouseDrag" />
+                </local:MouseGestureHandler.AttachedHandler>
+            </Image>
             <Ellipse Width="6" Height="6" Margin="-3"
                      Canvas.Left="{Binding BaseX, Mode=OneWay}"
                      Canvas.Top="{Binding BaseY, Mode=OneWay}"

@@ -24,6 +24,7 @@ namespace Symirror3
             var dpi = VisualTreeHelper.GetDpi(MapImage);
             viewModel = new ViewModel(drawSuface, (int)Math.Round(256.0 * dpi.DpiScaleX));
             DataContext = viewModel;
+            new MouseGestureHandler(null, DrawSuface_MouseDrag).Attach(drawSuface);
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -36,82 +37,38 @@ namespace Symirror3
             viewModel?.Rotate(0f, 0f, 0f);
         }
 
-        int _oldX, _oldY;
-        bool _pushing;
-        private void DrawSuface_MouseDown(object sender, Win32.MouseEventArgs e)
-        {
-            _pushing = true;
-            _oldX = e.X;
-            _oldY = e.Y;
-        }
 
-        private void DrawSuface_MouseUp(object sender, Win32.MouseEventArgs e)
+        private void DrawSuface_MouseDrag(object sender, MouseGestureEventArgs e)
         {
-            _pushing = false;
-        }
-
-        private void DrawSuface_MouseMove(object sender, Win32.MouseEventArgs e)
-        {
-            if (_pushing)
+            if (e.Button == MouseButton.Right)
             {
-                if (e.Button.HasFlag(Win32.MouseButtons.Right))
-                {
-                    viewModel.Rotate(0f, 0f, _oldX - e.X);
-                }
-                else
-                {
-                    viewModel.Rotate(_oldX - e.X, _oldY - e.Y, 0f);
-                }
-
-                _oldX = e.X;
-                _oldY = e.Y;
+                viewModel.Rotate(0f, 0f, -e.Delta.X);
+            }
+            else
+            {
+                viewModel.Rotate(-e.Delta.X, -e.Delta.Y, 0f);
             }
         }
 
-        const MouseButton EmptyMouseButton = (MouseButton)(-1);
-        Point _mapClickPoint, _mapBeforePoint;
-        MouseButton _mapButton = EmptyMouseButton;
-        private void MapImage_MouseDown(object sender, MouseButtonEventArgs e)
+        private void MapImage_MouseClick(object sender, MouseGestureEventArgs e)
         {
-            if (_mapButton != EmptyMouseButton) return;
-
-            if (e.ChangedButton != MouseButton.Left && e.ChangedButton != MouseButton.Right)
-                return;
-
-            _mapClickPoint = e.GetPosition(MapImage);
-            _mapBeforePoint = _mapClickPoint;
-            MapImage.CaptureMouse();
-            _mapButton = e.ChangedButton;
-        }
-
-        private void MapImage_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            var p = e.GetPosition(MapImage);
-            if (_mapButton == MouseButton.Left && _mapClickPoint == p)
+            if (e.Button == MouseButton.Left)
             {
-                viewModel.MoveBasePointTo(new Point(p.X / 128.0 - 1.0, p.Y / 128.0 - 1.0));
+                viewModel.MoveBasePointTo(new Point(e.Position.X / 128.0 - 1.0, e.Position.Y / 128.0 - 1.0));
             }
-
-            _mapButton = EmptyMouseButton;
-            MapImage.ReleaseMouseCapture();
         }
 
-        private void MapImage_MouseMove(object sender, MouseEventArgs e)
+        private void MapImage_MouseDrag(object sender, MouseGestureEventArgs e)
         {
-            var p = e.GetPosition(MapImage);
-            if (MapImage.IsMouseCaptured)
-            {   
-                switch (_mapButton)
-                {
-                    case MouseButton.Left:
-                        _mapClickPoint = default;
-                        viewModel.ChangeBasePoint(new Point(p.X / 128.0 - 1.0, p.Y / 128.0 - 1.0));
-                        break;
-                    case MouseButton.Right:
-                        viewModel.MoveBasePointRelative(_mapBeforePoint.X - p.X, _mapBeforePoint.Y - p.Y);
-                        _mapBeforePoint = p;
-                        break;
-                }
+            if (e.Button == MouseButton.Left)
+            {
+                viewModel.ChangeBasePoint(new Point(e.Position.X / 128.0 - 1.0, e.Position.Y / 128.0 - 1.0));
+
+            }
+            else if (e.Button == MouseButton.Right)
+            {
+                viewModel.MoveBasePointRelative(-e.Delta.X, -e.Delta.Y);
+
             }
         }
     }
