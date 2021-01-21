@@ -32,7 +32,8 @@
                      Canvas.Top="{Binding BaseY, Mode=OneWay}"
                      Fill="{x:Static Brushes.White}"
                      Stroke="{x:Static Brushes.Black}"
-                     StrokeThickness="1" />
+                     StrokeThickness="1"
+                     IsHitTestVisible="False" />
         </Canvas>
         <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="120" Margin="4">
             <TextBlock Text="{Binding Path=Language.Texts[Symmetry],Mode=OneWay}" />
