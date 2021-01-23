@@ -27,6 +27,31 @@
                                                MouseDrag="MapImage_MouseDrag" />
                 </local:MouseGestureHandler.AttachedHandler>
             </Image>
+            <Ellipse Width="32" Height="32" Margin="-16"
+                     Canvas.Left="{Binding CorrectedX, Mode=OneWay}"
+                     Canvas.Top="{Binding CorrectedY, Mode=OneWay}"
+                     Fill="{x:Static Brushes.White}"
+                     IsHitTestVisible="False"
+                     SnapsToDevicePixels="False"
+                     UseLayoutRounding="False">
+                <Ellipse.Style>
+                    <Style TargetType="{x:Type Ellipse}">
+                        <Setter Property="Opacity" Value="0.5" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ShowCorrectedPoint, Mode=OneWay}" Value="True">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation From="0.5" To="0" Duration="00:00:00.5"
+                                                             Storyboard.TargetProperty="Opacity" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Ellipse.Style>
+            </Ellipse>
             <Ellipse Width="6" Height="6" Margin="-3"
                      Canvas.Left="{Binding BaseX, Mode=OneWay}"
                      Canvas.Top="{Binding BaseY, Mode=OneWay}"

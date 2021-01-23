@@ -134,6 +134,15 @@ namespace Symirror3
         private double _baseY;
         public double BaseY { get => _baseY; private set => SetValue(ref _baseY, value); }
 
+        private double _correctedX;
+        public double CorrectedX { get => _correctedX; private set => SetValue(ref _correctedX, value); }
+
+        private double _correctedY;
+        public double CorrectedY { get => _correctedY; private set => SetValue(ref _correctedY, value); }
+
+        private bool _showCorrectedPoint;
+        public bool ShowCorrectedPoint { get => _showCorrectedPoint; private set => SetValue(ref _showCorrectedPoint, value); }
+
         public ImageSource GeneratorMap => _generatorMap.ImageSource;
 
         public void Rotate(double x, double y, double z) => _dispatcher.SendMessage(new Rotate((float)x, (float)y, (float)z));
@@ -144,9 +153,23 @@ namespace Symirror3
             _dispatcher.SendMessage(new ChangeBasePoint(_generatorMap.DpiToModel(point)));
         }
 
-        public void MoveBasePointTo(Point point)
+        public async void MoveBasePointTo(Point point)
         {
-            _dispatcher.SendMessage(new MoveBasePointTo(GetPoints().First(IsNear)));
+            var vp = GetPoints().FirstOrDefault(IsNear);
+            if (vp != default)
+            {
+                _dispatcher.SendMessage(new MoveBasePointTo(vp));
+                var sp = _generatorMap.ModelToDpi(in vp);
+                CorrectedX = sp.X;
+                CorrectedY = sp.Y;
+                ShowCorrectedPoint = false;
+                await System.Windows.Threading.Dispatcher.Yield();
+                ShowCorrectedPoint = true;
+            }
+            else
+            {
+                _dispatcher.SendMessage(new MoveBasePointTo(_generatorMap.DpiToModel(point)));                
+            }
 
             IEnumerable<SphericalPoint> GetPoints()
             {
@@ -162,11 +185,10 @@ namespace Symirror3
                     PType.Dirhombic when Symbol.TryGetDirhombicPoint(out var p) => p,
                     _ => face.GetIncenter(),
                 };
-                yield return _generatorMap.DpiToModel(point);
             }
 
             bool IsNear(SphericalPoint modelPoint) =>
-                (_generatorMap.ModelToDpi(modelPoint) - point).LengthSquared <= 400d;
+                (_generatorMap.ModelToDpi(modelPoint) - point).LengthSquared <= 256.0;
         }
 
         public void ChangeBasePoint(Point point)
@@ -221,16 +243,6 @@ namespace Symirror3
         private void SetValue<T>(ref T storage, T value, Func<T, IMessage> action, [CallerMemberName] string propertyName = "")
         {
             if (SetValue(ref storage, value, propertyName)) _dispatcher.SendMessage(action(value));
-        }
-
-        private static int ParseInt(object? index)
-        {
-            return index switch
-            {
-                int i => i,
-                string s when int.TryParse(s, out var i) => i,
-                _ => 0,
-            };
         }
 
         public void Dispose() => _dispatcher.Dispose();

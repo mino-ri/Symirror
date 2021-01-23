@@ -7,6 +7,8 @@ namespace Symirror3
 {
     public class MouseGestureHandler
     {
+        public const double ClickableRange = 5d;
+        public const double ClickableRangeSquared = ClickableRange * ClickableRange;
         public static MouseGestureHandler GetAttachedHandler(DependencyObject obj) => (MouseGestureHandler)obj.GetValue(AttachedHandlerProperty);
         public static void SetAttachedHandler(DependencyObject obj, MouseGestureHandler value) => obj.SetValue(AttachedHandlerProperty, value);
 
@@ -85,9 +87,10 @@ namespace Symirror3
                  sender is not FrameworkElement target ||
                  !target.IsMouseCaptured) return;
 
-            _mouseDownPoint = default;
             var p = e.GetPosition(target);
-            MouseDrag?.Invoke(target, new MouseGestureEventArgs(_targetButton, p, p - _mouseBeforePoint));
+            var e2 = new MouseGestureEventArgs(_targetButton, _mouseDownPoint, p, p - _mouseBeforePoint);
+            MouseDrag?.Invoke(target, e2);
+            if (e2.Handled) _mouseDownPoint = default;
             _mouseBeforePoint = p;
         }
 
@@ -98,10 +101,8 @@ namespace Symirror3
                 !target.IsMouseCaptured) return;
             
             var p = e.GetPosition(target);
-            if (_mouseDownPoint == p)
-            {
-                MouseClick?.Invoke(target, new MouseGestureEventArgs(_targetButton, p, p - _mouseBeforePoint));
-            }
+            if ((_mouseDownPoint - p).LengthSquared <= ClickableRangeSquared)
+                MouseClick?.Invoke(target, new MouseGestureEventArgs(_targetButton, _mouseDownPoint, p, p - _mouseBeforePoint));
 
             target.ReleaseMouseCapture();
             _targetButton = EmptyMouseButton;
@@ -109,7 +110,7 @@ namespace Symirror3
 
         private void Win32_MouseDown(object? sender, Win32.MouseEventArgs e)
         {
-            if (sender is not Win32.Control target) return;
+            if (sender is not Win32.Control) return;
 
             if (_targetButton != EmptyMouseButton)
             {
@@ -133,9 +134,10 @@ namespace Symirror3
             if (_targetButton == EmptyMouseButton ||
                 sender is not Win32.Control target) return;
 
-            _mouseDownPoint = default;
             var p = new Point(e.X, e.Y);
-            MouseDrag?.Invoke(target, new MouseGestureEventArgs(_targetButton, p, p - _mouseBeforePoint));
+            var e2 = new MouseGestureEventArgs(_targetButton, _mouseDownPoint, p, p - _mouseBeforePoint);
+            MouseDrag?.Invoke(target, e2);
+            if (e2.Handled) _mouseDownPoint = default;
             _mouseBeforePoint = p;
         }
 
@@ -145,11 +147,8 @@ namespace Symirror3
                 sender is not Win32.Control target) return;
 
             var p = new Point(e.X, e.Y);
-            if (_mouseDownPoint == p)
-            {
-                MouseClick?.Invoke(target, new MouseGestureEventArgs(_targetButton, p, p - _mouseBeforePoint));
-            }
-
+            if ((_mouseDownPoint - p).LengthSquared <= ClickableRangeSquared)
+                MouseClick?.Invoke(target, new MouseGestureEventArgs(_targetButton, _mouseDownPoint, p, p - _mouseBeforePoint));
             _targetButton = EmptyMouseButton;
         }
 
@@ -160,12 +159,16 @@ namespace Symirror3
 
     public class MouseGestureEventArgs : EventArgs
     {
+        private readonly Point _mouseDownPosition;
         public MouseButton Button { get; }
         public Point Position { get; }
         public Vector Delta { get; }
+        public bool Handled { get; set; }
         
-        public MouseGestureEventArgs(MouseButton button, Point position, Vector delta) =>
-            (Button, Position, Delta) = (button, position, delta);
+        public MouseGestureEventArgs(MouseButton button, Point mouseDownPosition, Point position, Vector delta) =>
+            (Button, _mouseDownPosition, Position, Delta) = (button, mouseDownPosition, position, delta);
+
+        public bool IsInClickableRange() => (_mouseDownPosition - Position).LengthSquared <= MouseGestureHandler.ClickableRangeSquared;
     }
 
     public delegate void MouseGestureEventHandler(object sender, MouseGestureEventArgs e);

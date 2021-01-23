@@ -33,9 +33,15 @@ namespace Symirror3
         private void DrawSuface_MouseDrag(object sender, MouseGestureEventArgs e)
         {
             if (e.Button == MouseButton.Right)
+            {
                 viewModel.Rotate(0f, 0f, -e.Delta.X);
+                e.Handled = true;
+            }
             else
+            {
                 viewModel.Rotate(-e.Delta.X, -e.Delta.Y, 0f);
+                e.Handled = true;
+            }
         }
 
         private void MapImage_MouseClick(object sender, MouseGestureEventArgs e)
@@ -46,10 +52,16 @@ namespace Symirror3
 
         private void MapImage_MouseDrag(object sender, MouseGestureEventArgs e)
         {
-            if (e.Button == MouseButton.Left)
+            if (e.Button == MouseButton.Left && !e.IsInClickableRange())
+            {
                 viewModel.ChangeBasePoint(e.Position);
+                e.Handled = true;
+            }
             else if (e.Button == MouseButton.Right)
+            {
                 viewModel.MoveBasePointRelative(-e.Delta.X, -e.Delta.Y);
+                e.Handled = true;
+            }
         }
     }
 }
