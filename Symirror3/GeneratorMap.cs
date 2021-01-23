@@ -12,6 +12,8 @@ namespace Symirror3
 {
     public class GeneratorMap
     {
+        private const double Sqrt2 = 1.4142135623730951;
+
         private SymmetryTriangle _triangle;
         private QuaternionD _modelToView;
         private QuaternionD _viewToModel;
@@ -94,6 +96,44 @@ namespace Symirror3
                             distance0 = SphericalPoint.Dot(reversed2, reversed0);
                             distance1 = SphericalPoint.Dot(reversed0, reversed1);
                             distance2 = SphericalPoint.Dot(reversed1, reversed2);
+                            color = 0xFF000000;
+                            addingFactor =
+                                SphericalPoint.Dot(edges[0].Normal, mp) >= 0.0 &&
+                                SphericalPoint.Dot(edges[1].Normal, mp) >= 0.0 &&
+                                SphericalPoint.Dot(edges[2].Normal, mp) >= 0.0
+                                ? 0xEEu : 0x44u;
+                            if (distance0 <= distance1)
+                                color |= addingFactor;
+                            if (distance1 <= distance2)
+                                color |= addingFactor << 8;
+                            if (distance2 <= distance0)
+                                color |= addingFactor << 16;
+                            p[x + y * stride] = color;
+                        }
+                    }
+            }
+            else if (_polyhedronType == PolyhedronType.Dirhombic)
+            {
+                SphericalPoint mp, reversed0, reversed1, reversed2;
+                double distance0, distance1, distance2;
+                uint color, addingFactor;
+                for (var y = 0; y < _screenSize; y++)
+                    for (var x = 0; x < _screenSize; x++)
+                    {
+                        var sp = new Point(x / (double)_halfSize - 1.0, y / (double)_halfSize - 1.0);
+                        if (((Vector)sp).LengthSquared >= 1.0)
+                        {
+                            p[x + y * stride] = 0xFFFFFFFF;
+                        }
+                        else
+                        {
+                            mp = ViewToModel(sp);
+                            reversed0 = edges[0].Reverse(in mp);
+                            reversed1 = edges[1].Reverse(in mp);
+                            reversed2 = edges[2].Reverse(in mp);
+                            distance0 = (reversed2 - reversed0).Length;
+                            distance1 = (reversed0 - reversed1).Length;
+                            distance2 = (reversed1 - reversed2).Length / Sqrt2;
                             color = 0xFF000000;
                             addingFactor =
                                 SphericalPoint.Dot(edges[0].Normal, mp) >= 0.0 &&

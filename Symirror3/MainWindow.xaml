@@ -44,16 +44,6 @@
             <ComboBox ItemsSource="{Binding AllPolyhedronTypes, Mode=OneTime}" SelectedValue="{Binding PolyhedronType}" DisplayMemberPath="ViewText" Margin="0,3" />
             <CheckBox Content="{Binding Path=Language.Texts[AutoRotation],Mode=OneWay}" IsChecked="{Binding AutoRotation}" Margin="0,3"/>
             <Button Content="{Binding Path=Language.Texts[ResetRotation],Mode=OneWay}" Command="{Binding ResetRotationCommand}" Margin="4,3,4,0" />
-            <Canvas Width="112" Height="100">
-                <Polygon Points="56,15 10,90 102,90, 56,15" Stroke="Orange" StrokeThickness="2"/>
-                <Button Width="32" Height="24" Canvas.Left="40" Canvas.Top="11" CommandParameter="2" Command="{Binding MoveBasePointToVertexCommand, Mode=OneTime}" Content="{Binding Symbol[2], Mode=OneWay}" />
-                <Button Width="32" Height="24" Canvas.Left="2"  Canvas.Top="78" CommandParameter="0" Command="{Binding MoveBasePointToVertexCommand, Mode=OneTime}" Content="{Binding Symbol[0], Mode=OneWay}" />
-                <Button Width="32" Height="24" Canvas.Left="78" Canvas.Top="78" CommandParameter="1" Command="{Binding MoveBasePointToVertexCommand, Mode=OneTime}" Content="{Binding Symbol[1], Mode=OneWay}" />
-                <Button Width="24" Height="24" Canvas.Left="17" Canvas.Top="44" CommandParameter="1" Command="{Binding MoveBasePointToBisectorCrossCommand, Mode=OneTime}" />
-                <Button Width="24" Height="24" Canvas.Left="44" Canvas.Top="78" CommandParameter="2" Command="{Binding MoveBasePointToBisectorCrossCommand, Mode=OneTime}" />
-                <Button Width="24" Height="24" Canvas.Left="71" Canvas.Top="44" CommandParameter="0" Command="{Binding MoveBasePointToBisectorCrossCommand, Mode=OneTime}" />
-                <Button Width="24" Height="24" Canvas.Left="44" Canvas.Top="50" CommandParameter="0" Command="{Binding MoveBasePointToIncenterCommand, Mode=OneTime}" />
-            </Canvas>
         </StackPanel>
         <ComboBox DockPanel.Dock="Bottom" Margin="4" ItemsSource="{Binding AllLanguages,Mode=OneTime}"
                 SelectedItem="{Binding Language,Mode=TwoWay}" />

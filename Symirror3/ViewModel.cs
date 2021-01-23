@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -145,44 +146,36 @@ namespace Symirror3
 
         public void MoveBasePointTo(Point point)
         {
-            _dispatcher.SendMessage(new MoveBasePointTo(_generatorMap.DpiToModel(point)));
+            _dispatcher.SendMessage(new MoveBasePointTo(GetPoints().First(IsNear)));
+
+            IEnumerable<SphericalPoint> GetPoints()
+            {
+                var face = _dispatcher.Symmetry.Faces[0];
+                for (var i = 0; i < 3; i++)
+                {
+                    yield return face[i].Point;
+                    yield return face.GetBisectorCross(i);
+                }
+                yield return PolyhedronType.Value switch
+                {
+                    PType.Snub or PType.SnubDual when Symbol.TryGetSnubPoint(out var p) => p,
+                    PType.Dirhombic when Symbol.TryGetDirhombicPoint(out var p) => p,
+                    _ => face.GetIncenter(),
+                };
+                yield return _generatorMap.DpiToModel(point);
+            }
+
+            bool IsNear(SphericalPoint modelPoint) =>
+                (_generatorMap.ModelToDpi(modelPoint) - point).LengthSquared <= 400d;
         }
 
         public void ChangeBasePoint(Point point)
         {
             _dispatcher.SendMessage(new ChangeBasePoint(_generatorMap.DpiToModel(point)));
         }
-
+        
         public ICommand ResetRotationCommand { get; }
         public void ResetRotation(object? _) => _dispatcher.SendMessage(new ResetRotation());
-
-        public ICommand MoveBasePointToVertexCommand { get; }
-        public void MoveBasePointToVertex(object? arg)
-        {
-            var index = Math.Clamp(ParseInt(arg), 0, 2);
-            var point = _dispatcher.Symmetry.Faces[0][index].Point;
-            _dispatcher.SendMessage(new MoveBasePointTo(point));
-        }
-
-        public ICommand MoveBasePointToBisectorCrossCommand { get; }
-        public void MoveBasePointToBisectorCross(object? arg)
-        {
-            var index = Math.Clamp(ParseInt(arg), 0, 2);
-            var point = _dispatcher.Symmetry.Faces[0].GetBisectorCross(index);
-            _dispatcher.SendMessage(new MoveBasePointTo(point));
-        }
-
-        public ICommand MoveBasePointToIncenterCommand { get; }
-        public void MoveBasePointToIncenter(object? _)
-        {
-            var point = PolyhedronType.Value switch
-            {
-                PType.Snub or PType.SnubDual when Symbol.TryGetSnubPoint(out var p) => p,
-                PType.Dirhombic when Symbol.TryGetDirhombicPoint(out var p) => p,
-                _ => _dispatcher.Symmetry.Faces[0].GetIncenter(),
-            };
-            _dispatcher.SendMessage(new MoveBasePointTo(point));
-        }
 
         public ViewModel(Win32Control control, double mapSize, double dpiScale)
         {
@@ -193,9 +186,6 @@ namespace Symirror3
             AllFaceRenderTypes = GetEnums<FaceRenderType>();
             _faceRenderType = AllFaceRenderTypes[0];
             ResetRotationCommand = new ActionCommand(ResetRotation);
-            MoveBasePointToVertexCommand = new ActionCommand(MoveBasePointToVertex);
-            MoveBasePointToBisectorCrossCommand = new ActionCommand(MoveBasePointToBisectorCross);
-            MoveBasePointToIncenterCommand = new ActionCommand(MoveBasePointToIncenter);
 
             _viewDispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
             _generatorMap = new GeneratorMap(mapSize, dpiScale, SymmetryTriangle.Create(_symbol), _polyhedronType.Value);
