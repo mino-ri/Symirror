@@ -15,12 +15,12 @@
         ContentRendered="Window_ContentRendered"
         Closing="Window_Closing"
         Activated="Window_Activated">
-    <DockPanel>
-        <WindowsFormsHost Width="512" Height="512" DockPanel.Dock="Left" Background="Black"
-                          Cursor="SizeAll">
+    <DockPanel Width="768" Height="512">
+        <WindowsFormsHost Width="512" Height="512" DockPanel.Dock="Left" Background="Black" Cursor="SizeAll"
+                          Focusable="False">
             <local:DirectXHost Width="512" Height="512" x:Name="drawSuface" />
         </WindowsFormsHost>
-        <Canvas DockPanel.Dock="Bottom" Width="256" Height="256" ClipToBounds="True">
+        <Canvas DockPanel.Dock="Bottom" Width="256" Height="256" ClipToBounds="True" Cursor="Cross">
             <Image Name="MapImage" Width="256" Height="256" Source="{Binding GeneratorMap}">
                 <local:MouseGestureHandler.AttachedHandler>
                     <local:MouseGestureHandler MouseClick="MapImage_MouseClick"
@@ -62,17 +62,13 @@
                      SnapsToDevicePixels="False"
                      UseLayoutRounding="False" />
         </Canvas>
-        <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Width="120" Margin="4">
-            <TextBlock Text="{Binding Path=Language.Texts[Symmetry],Mode=OneWay}" />
-            <ComboBox ItemsSource="{Binding AllSymbols, Mode=OneTime}" SelectedValue="{Binding Symbol}" Margin="0,3" />
-            <TextBlock Text="{Binding Path=Language.Texts[PolyhedronType],Mode=OneWay}" />
-            <ComboBox ItemsSource="{Binding AllPolyhedronTypes, Mode=OneTime}" SelectedValue="{Binding PolyhedronType}" DisplayMemberPath="ViewText" Margin="0,3" />
-            <CheckBox Content="{Binding Path=Language.Texts[AutoRotation],Mode=OneWay}" IsChecked="{Binding AutoRotation}" Margin="0,3"/>
-            <Button Content="{Binding Path=Language.Texts[ResetRotation],Mode=OneWay}" Command="{Binding ResetRotationCommand}" Margin="4,3,4,0" />
-        </StackPanel>
-        <ComboBox DockPanel.Dock="Bottom" Margin="4" ItemsSource="{Binding AllLanguages,Mode=OneTime}"
-                SelectedItem="{Binding Language,Mode=TwoWay}" />
-        <StackPanel Orientation="Vertical" Width="120" Margin="4">
+        <DockPanel DockPanel.Dock="Left" Width="124" Margin="4">
+            <TextBlock DockPanel.Dock="Top" Text="{Binding Path=Language.Texts[PolyhedronType],Mode=OneWay}" />
+            <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding AllPolyhedronTypes, Mode=OneTime}" SelectedValue="{Binding PolyhedronType}" DisplayMemberPath="ViewText" Margin="0,3" />
+            <TextBlock DockPanel.Dock="Top" Text="{Binding Path=Language.Texts[Symmetry],Mode=OneWay}" />
+            <ListBox ItemsSource="{Binding AllSymbols, Mode=OneTime}" SelectedValue="{Binding Symbol}" Margin="0,3,0,0" />
+        </DockPanel>
+        <StackPanel Orientation="Vertical" Margin="0,4,4,4">
             <GroupBox Header="{Binding Path=Language.Texts[FacesVisiblility],Mode=OneWay}" Margin="0,2">
                 <StackPanel Orientation="Vertical">
                     <Grid>
@@ -117,6 +113,11 @@
                 <Run Text="{Binding Path=Language.Texts[ShadowFactor],Mode=OneWay}"/><Run Text="{Binding Shadow,Mode=OneWay}"/>
             </TextBlock>
             <Slider Minimum="0" Maximum="100" Value="{Binding Shadow}" IsSnapToTickEnabled="True" TickFrequency="1" />
+            <CheckBox Content="{Binding Path=Language.Texts[AutoRotation],Mode=OneWay}" IsChecked="{Binding AutoRotation}" Margin="0,6,0,0"/>
+            <Button Content="{Binding Path=Language.Texts[ResetRotation],Mode=OneWay}" Command="{Binding ResetRotationCommand}" Margin="0,3,0,0" />
+            <ComboBox DockPanel.Dock="Bottom" Margin="0,3,0,0"
+                      ItemsSource="{Binding AllLanguages,Mode=OneTime}"
+                      SelectedItem="{Binding Language,Mode=TwoWay}" />
         </StackPanel>
     </DockPanel>
 </Window>

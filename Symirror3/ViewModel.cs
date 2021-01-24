@@ -234,7 +234,7 @@ namespace Symirror3
 
         private bool SetValue<T>(ref T storage, T value, [CallerMemberName] string propertyName = "")
         {
-            if (Equals(storage, value)) return false;
+            if (EqualityComparer<T>.Default.Equals(storage, value)) return false;
             storage = value;
             OnPropertyChanged(propertyName);
             return true;
