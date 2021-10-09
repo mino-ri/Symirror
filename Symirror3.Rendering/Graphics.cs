@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 using System.Linq;
 using IndirectX;
 using IndirectX.Dxgi;
@@ -10,7 +9,7 @@ namespace Symirror3.Rendering
 {
     internal sealed class Graphics : IDisposable
     {
-        private const int TriangleCount = 28;
+        public const int TriangleCount = 28;
         private static readonly ushort[] _stripIndices;
         private static readonly ushort[] _fanIndices;
 
@@ -18,6 +17,9 @@ namespace Symirror3.Rendering
         private readonly ArrayBuffer<ushort> _indexBuffer;
         private readonly ArrayBuffer<Vertex> _vertexBuffer;
         private readonly ValueBuffer<Matrix4> _matrixBuffer;
+        private readonly DepthStencilState _ignoreStencilState;
+        private readonly DepthStencilState _stencilMaskState;
+        private readonly DepthStencilState _writeStencilState;
         private Matrix4 _world;
         private Matrix4 _viewProj;
 
@@ -26,7 +28,7 @@ namespace Symirror3.Rendering
 
         internal Graphics(IntPtr surfaceHandle, int width, int height)
         {
-            _graphics = new IndirectX.EasyRenderer.Graphics(surfaceHandle, width, height, true, 60, 1);
+            _graphics = new IndirectX.EasyRenderer.Graphics(surfaceHandle, width, height, true, 60, 1, useStencil: true);
             using (var shader = new ShaderSource(ShaderCode,
                 new()
                 {
@@ -37,7 +39,7 @@ namespace Symirror3.Rendering
                 new InputElementDesc { SemanticName = "COLOR", Format = Format.R32G32B32A32Float, AlignedByteOffset = 16 }))
                 _graphics.Set(shader);
 
-            _vertexBuffer = _graphics.RegisterVertexBuffer<Vertex>(0, TriangleCount + 2);
+            _vertexBuffer = _graphics.RegisterVertexBuffer<Vertex>(0, TriangleCount * 3);
             _indexBuffer = _graphics.RegisterIndexBuffer(TriangleCount * 3);
             _matrixBuffer = _graphics.RegisterConstantBuffer<Matrix4>(0, ShaderStages.VertexShader);
             var size = Math.Min(width, height) * 0.4f;
@@ -49,6 +51,80 @@ namespace Symirror3.Rendering
             _graphics.PrimitiveTopology = PrimitiveTopology.TriangleList;
             for (var i = 0; i < _vertexBuffer.Buffer.Length; i++)
                 _vertexBuffer.Buffer[i].Rhw = 1f;
+
+            _ignoreStencilState = _graphics.CreateDepthStencilState(new DepthStencilDesc
+            {
+                DepthEnable = true,
+                DepthFunc = ComparisonFunc.Less,
+                DepthWriteMask = DepthWriteMask.All,
+                StencilEnable = false,
+                StencilReadMask = 0xff,
+                StencilWriteMask = 0xff,
+                FrontFace =
+                {
+                    StencilFunc = ComparisonFunc.Never,
+                    StencilPassOp = StencilOp.Keep,
+                    StencilDepthFailOp = StencilOp.Keep,
+                    StencilFailOp = StencilOp.Keep,
+                },
+                BackFace =
+                {
+                    StencilFunc = ComparisonFunc.Never,
+                    StencilPassOp = StencilOp.Keep,
+                    StencilDepthFailOp = StencilOp.Keep,
+                    StencilFailOp = StencilOp.Keep,
+                },
+            });
+
+            _stencilMaskState = _graphics.CreateDepthStencilState(new DepthStencilDesc
+            {
+                DepthEnable = true,
+                DepthFunc = ComparisonFunc.Less,
+                DepthWriteMask = DepthWriteMask.All,
+                StencilEnable = true,
+                StencilReadMask = 0xff,
+                StencilWriteMask = 0xff,
+                FrontFace =
+                {
+                    StencilFunc = ComparisonFunc.NotEqual,
+                    StencilPassOp = StencilOp.Zero,
+                    StencilDepthFailOp = StencilOp.Zero,
+                    StencilFailOp = StencilOp.Keep,
+                },
+                BackFace =
+                {
+                    StencilFunc = ComparisonFunc.NotEqual,
+                    StencilPassOp = StencilOp.Zero,
+                    StencilDepthFailOp = StencilOp.Zero,
+                    StencilFailOp = StencilOp.Keep,
+                },
+            });
+
+            _writeStencilState = _graphics.CreateDepthStencilState(new DepthStencilDesc
+            {
+                DepthEnable = true,
+                DepthFunc = ComparisonFunc.Never,
+                DepthWriteMask = DepthWriteMask.All,
+                StencilEnable = true,
+                StencilReadMask = 0xff,
+                StencilWriteMask = 0xff,
+                FrontFace =
+                {
+                    StencilFunc = ComparisonFunc.Always,
+                    StencilPassOp = StencilOp.Invert,
+                    StencilDepthFailOp = StencilOp.Invert,
+                    StencilFailOp = StencilOp.Keep,
+                },
+                BackFace =
+                {
+                    StencilFunc = ComparisonFunc.Always,
+                    StencilPassOp = StencilOp.Invert,
+                    StencilDepthFailOp = StencilOp.Invert,
+                    StencilFailOp = StencilOp.Keep,
+                },
+            });
+
+            _graphics.SetDepthStencilState(_ignoreStencilState, 0);
         }
 
         public void FlushWorld() => _matrixBuffer.WriteByRef(_world * _viewProj);
@@ -63,19 +139,37 @@ namespace Symirror3.Rendering
 
         public void SetFanIndices() => _indexBuffer.Write(_fanIndices);
 
-        public void Draw(int triangleCount)
+        public void IgnoreStencil() => _graphics.SetDepthStencilState(_ignoreStencilState, 0);
+
+        public void BeginWriteStencil() => _graphics.SetDepthStencilState(_writeStencilState, 0);
+
+        public void UseStencilMask() => _graphics.SetDepthStencilState(_stencilMaskState, 0);
+
+        public void DrawList(int triangleCount)
+        {
+            _vertexBuffer.Flush();
+            _graphics.DrawList(triangleCount * 3);
+        }
+
+        public void DrawIndexed(int triangleCount)
         {
             _vertexBuffer.Flush();
             _graphics.DrawIndexedList(triangleCount * 3);
-            var v = new Vector4(Vertices[0].Vector, 1f) * (_world * _viewProj);
-            Console.WriteLine($"{v.X}, {v.Y}, {v.Z}, {v.W}");
         }
 
         public void Clear() => _graphics.Clear(Color.Black);
 
+        public void ClearStencil() => _graphics.ClearStencil(0);
+
         public void Present() => _graphics.Present();
 
-        public void Dispose() => _graphics.Dispose();
+        public void Dispose()
+        {
+            _ignoreStencilState.Dispose();
+            _stencilMaskState.Dispose();
+            _writeStencilState.Dispose();
+            _graphics.Dispose();
+        }
 
         static Graphics()
         {

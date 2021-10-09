@@ -239,7 +239,8 @@ namespace Symirror3.Rendering
             var (light, shadow) = (_renderer.LightFactor, _renderer.ShadowFactor);
             _renderer = msg.FaceRenderType switch
             {
-                FaceRenderType.Holed => new HoledPolygonRenderer(),
+                FaceRenderType.Frame => new FramePolygonRenderer(),
+                FaceRenderType.EvenOdd => new EvenOddPolygonRenderer(),
                 _ => new StandardPolygonRenderer(),
             };
             _renderer.LightFactor = light;

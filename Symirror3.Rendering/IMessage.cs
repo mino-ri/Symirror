@@ -42,6 +42,7 @@ namespace Symirror3.Rendering
     public enum FaceRenderType
     {
         Fill,
-        Holed,
+        EvenOdd,
+        Frame,
     }
 }
