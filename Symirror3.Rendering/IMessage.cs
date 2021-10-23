@@ -6,7 +6,7 @@ namespace Symirror3.Rendering
 {
     public interface IMessage { }
 
-    public record ChangeLight(int Light, int Shadow) : IMessage;
+    public record ChangeLight(LightParameter Parameter, int Value) : IMessage;
 
     public record MoveBasePoint(float RotateX, float RotateY) : IMessage;
 
@@ -31,6 +31,15 @@ namespace Symirror3.Rendering
     public record ChangeFaceViewType(FaceViewType FaceViewType) : IMessage;
 
     public record ChangeFaceRenderType(FaceRenderType FaceRenderType) : IMessage;
+
+    public enum LightParameter
+    {
+        AmbientLight,
+        DiffuseLight,
+        SpecularLight,
+        SpecularLightSharpness,
+        LightSourceDistance,
+    }
 
     public enum FaceViewType
     {

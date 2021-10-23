@@ -16,14 +16,13 @@ namespace Symirror3.Rendering
             if (polygon.Vertices.Length < 3)
                 return;
 
-            var color = GetLightedColor(polygon, graphics);
+            SetMaterial(polygon, graphics);
             var vertices = graphics.Vertices;
             if (polygon.Vertices.Length == 3)
             {
                 for (var i = 0; i < 3; i++)
                 {
                     vertices[i].Vector = polygon.Vertices[i].Vector;
-                    vertices[i].Color = color;
                 }
 
                 graphics.IgnoreStencil();
@@ -37,15 +36,12 @@ namespace Symirror3.Rendering
                 {
                     var vector = polygon.Vertices[i].Vector;
                     vertices[i + 1].Vector = vector;
-                    vertices[i + 1].Color = color;
                     center += vector;
                 }
 
                 // [0]は面の中心
                 vertices[0].Vector = center / polygon.Vertices.Length;
-                vertices[0].Color = color;
                 vertices[polygon.Vertices.Length + 1] = vertices[1];
-                vertices[polygon.Vertices.Length + 1].Color = color;
 
                 graphics.BeginWriteStencil();
                 graphics.DrawIndexed(polygon.Vertices.Length);

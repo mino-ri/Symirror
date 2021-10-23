@@ -124,10 +124,28 @@ namespace Symirror3.Rendering
 
         #region HandleMessageCore
 
+        private static readonly Vector3 _lightDirection = Vector3.Normalize(new Vector3(-1f, -1f, -2f));
         private void HandleMessageCore(ChangeLight msg)
         {
-            _renderer.LightFactor = msg.Light;
-            _renderer.ShadowFactor = msg.Shadow;
+            switch (msg.Parameter)
+            {
+                case LightParameter.AmbientLight:
+                    _graphics.LightBuffer.AmbientFactor = msg.Value / 100f;
+                    break;
+                case LightParameter.DiffuseLight:
+                    _graphics.LightBuffer.DiffuseFactor = msg.Value / 100f;
+                    break;
+                case LightParameter.SpecularLight:
+                    _graphics.LightBuffer.SpecularFactor = msg.Value / 100f;
+                    break;
+                case LightParameter.SpecularLightSharpness:
+                    _graphics.LightBuffer.SpecularIndex = (msg.Value + 5) / 5f;
+                    break;
+                case LightParameter.LightSourceDistance:
+                    _graphics.LightBuffer.LightSource = _lightDirection * (msg.Value / 5f);
+                    break;
+            }
+            _graphics.FlushLight();
         }
 
         private void HandleMessageCore(MoveBasePoint msg)
@@ -236,15 +254,12 @@ namespace Symirror3.Rendering
 
         private void HandleMessageCore(ChangeFaceRenderType msg)
         {
-            var (light, shadow) = (_renderer.LightFactor, _renderer.ShadowFactor);
             _renderer = msg.FaceRenderType switch
             {
                 FaceRenderType.Frame => new FramePolygonRenderer(),
                 FaceRenderType.EvenOdd => new EvenOddPolygonRenderer(),
                 _ => new StandardPolygonRenderer(),
             };
-            _renderer.LightFactor = light;
-            _renderer.ShadowFactor = shadow;
             _renderer.OnActivate(_graphics);
         }
 

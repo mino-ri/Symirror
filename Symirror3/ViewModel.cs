@@ -114,19 +114,7 @@ namespace Symirror3
             set => SetValue(ref _autoRotation, value, v => new ChangeAutoRotation(v));
         }
 
-        private int _light = 40;
-        public int Light
-        {
-            get => _light;
-            set => SetValue(ref _light, value, _ => new ChangeLight(_light, _shadow));
-        }
-
-        private int _shadow = 80;
-        public int Shadow
-        {
-            get => _shadow;
-            set => SetValue(ref _shadow, value, _ => new ChangeLight(_light, _shadow));
-        }
+        public LightParameterViewModel[] LightParameters { get; }
 
         private double _baseX;
         public double BaseX { get => _baseX; private set => SetValue(ref _baseX, value); }
@@ -144,6 +132,9 @@ namespace Symirror3
         public bool ShowCorrectedPoint { get => _showCorrectedPoint; private set => SetValue(ref _showCorrectedPoint, value); }
 
         public ImageSource GeneratorMap => _generatorMap.ImageSource;
+
+        public void SendLightParameter(LightParameter parameter, int value) =>
+            _dispatcher.SendMessage(new ChangeLight(parameter, value));
 
         public void Rotate(double x, double y, double z) => _dispatcher.SendMessage(new Rotate((float)x, (float)y, (float)z));
 
@@ -212,6 +203,14 @@ namespace Symirror3
             _viewDispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
             _generatorMap = new GeneratorMap(mapSize, dpiScale, SymmetryTriangle.Create(_symbol), _polyhedronType.Value);
             _dispatcher = new Dispatcher(control.Handle, control.Width, control.Height, Symbol);
+            LightParameters = new[]
+            {
+                new LightParameterViewModel(LightParameter.AmbientLight, 15, this),
+                new LightParameterViewModel(LightParameter.DiffuseLight, 90, this),
+                new LightParameterViewModel(LightParameter.SpecularLight, 25, this),
+                new LightParameterViewModel(LightParameter.SpecularLightSharpness, 20, this),
+                new LightParameterViewModel(LightParameter.LightSourceDistance, 40, this),
+            };
             _dispatcher.BasePointChanged += p => _viewDispatcher.Invoke(() =>
             {
                 var vp = _generatorMap.ModelToDpi(p);
@@ -219,7 +218,6 @@ namespace Symirror3
                 BaseY = vp.Y;
             });
             _dispatcher.SendMessage(new ChangeSymbol(Symbol, PolyhedronType.Value));
-            _dispatcher.SendMessage(new ChangeLight(Light, Shadow));
             _dispatcher.SendMessage(new ChangeFaceRenderType(FaceRenderType.Value));
             _dispatcher.SendMessage(new ChangeFaceViewType(FaceViewType.Value));
             _dispatcher.SendMessage(new ChangeFaceVisible(_faceVisibles));
@@ -249,16 +247,14 @@ namespace Symirror3
 
         private EnumValue<TEnum>[] GetEnums<TEnum>() where TEnum : struct, Enum
         {
-            return Enum.GetValues<TEnum>()
-                .Select(e => new EnumValue<TEnum>(e, this))
-                .ToArray();
+            return Array.ConvertAll(Enum.GetValues<TEnum>(), e => new EnumValue<TEnum>(e, this));
         }
     }
 
     public class EnumValue<TEnum> : INotifyPropertyChanged
         where TEnum : struct, Enum
     {
-        private readonly ViewModel _parent;
+        protected readonly ViewModel _parent;
 
         public TEnum Value { get; }
 
@@ -277,9 +273,32 @@ namespace Symirror3
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public class LightParameterViewModel : EnumValue<LightParameter>
+    {
+        private int _parameterValue;
+        public int ParameterValue
+        {
+            get => _parameterValue;
+            set
+            {
+                if (_parameterValue == value) return;
+                _parameterValue = value;
+                OnPropertyChanged();
+                _parent.SendLightParameter(Value, ParameterValue);
+            }
+        }
+
+        public LightParameterViewModel(LightParameter value, int parameterValue, ViewModel parent)
+            : base(value, parent)
+        {
+            _parameterValue = parameterValue;
+            _parent.SendLightParameter(value, parameterValue);
         }
     }
 }

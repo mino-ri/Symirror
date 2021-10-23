@@ -4,6 +4,8 @@ using IndirectX;
 using IndirectX.Dxgi;
 using IndirectX.D3D11;
 using IndirectX.EasyRenderer;
+using System.Reflection;
+using System.Numerics;
 
 namespace Symirror3.Rendering
 {
@@ -16,15 +18,17 @@ namespace Symirror3.Rendering
         private readonly IndirectX.EasyRenderer.Graphics _graphics;
         private readonly ArrayBuffer<ushort> _indexBuffer;
         private readonly ArrayBuffer<Vertex> _vertexBuffer;
-        private readonly ValueBuffer<Matrix4> _matrixBuffer;
+        private readonly ValueBuffer<TransformBuffer> _matrixBuffer;
+        private readonly ValueBuffer<MaterialBuffer> _materialBuffer;
+        private readonly ValueBuffer<LightBuffer> _lightBuffer;
         private readonly DepthStencilState _ignoreStencilState;
         private readonly DepthStencilState _stencilMaskState;
         private readonly DepthStencilState _writeStencilState;
-        private Matrix4 _world;
-        private Matrix4 _viewProj;
 
-        public ref Matrix4 World => ref _world;
+        public ref Matrix4 World => ref _matrixBuffer.Value.World;
+        private ref Matrix4 ViewProj => ref _matrixBuffer.Value.ViewProj;
         public Vertex[] Vertices => _vertexBuffer.Buffer;
+        public ref LightBuffer LightBuffer => ref _lightBuffer.Value;
 
         internal Graphics(IntPtr surfaceHandle, int width, int height)
         {
@@ -41,13 +45,28 @@ namespace Symirror3.Rendering
 
             _vertexBuffer = _graphics.RegisterVertexBuffer<Vertex>(0, TriangleCount * 3);
             _indexBuffer = _graphics.RegisterIndexBuffer(TriangleCount * 3);
-            _matrixBuffer = _graphics.RegisterConstantBuffer<Matrix4>(0, ShaderStages.VertexShader);
+            _matrixBuffer = _graphics.RegisterConstantBuffer<TransformBuffer>(0, ShaderStages.VertexShader);
+            _materialBuffer = _graphics.RegisterConstantBuffer<MaterialBuffer>(1, ShaderStages.PixelShader);
+            _lightBuffer = _graphics.RegisterConstantBuffer<LightBuffer>(2, ShaderStages.PixelShader);
+
             var size = Math.Min(width, height) * 0.4f;
-            _viewProj = Matrix4.LookAtLH(0f, 0f, 0f, 5f) *
+            ViewProj = Matrix4.LookAtLH(0f, 0f, 0f, 5f) *
                         Matrix4.Scaling(size, size, 1f, 1f) *
                         Matrix4.PerspectiveLH(5f, 0.3f, 10f, width, height);
-            _world = Matrix4.Identity;
-            _matrixBuffer.WriteByRef(_world * _viewProj);
+            World = Matrix4.Identity;
+            _matrixBuffer.Flush();
+
+            _materialBuffer.Value.NormalRhw = 1f;
+
+            _lightBuffer.Value.AmbientFactor = 0.125f;
+            _lightBuffer.Value.DiffuseFactor = 1f;
+            _lightBuffer.Value.SpecularFactor = 0.25f;
+            _lightBuffer.Value.SpecularIndex = 5f;
+            _lightBuffer.Value.Sight = new Vector4(0f, 0f, -5f, 1f);
+            _lightBuffer.Value.LightSource = new Vector3(-2f, -2f, -4f);
+            _lightBuffer.Value.LightSourceRhw = 1f;
+            _lightBuffer.Flush();
+
             _graphics.PrimitiveTopology = PrimitiveTopology.TriangleList;
             for (var i = 0; i < _vertexBuffer.Buffer.Length; i++)
                 _vertexBuffer.Buffer[i].Rhw = 1f;
@@ -127,13 +146,22 @@ namespace Symirror3.Rendering
             _graphics.SetDepthStencilState(_ignoreStencilState, 0);
         }
 
-        public void FlushWorld() => _matrixBuffer.WriteByRef(_world * _viewProj);
+        public void FlushWorld() => _matrixBuffer.Flush();
 
         public void SetWorld(in Matrix4 world)
         {
-            _world = world;
-            _matrixBuffer.WriteByRef(_world * _viewProj);
+            World = world;
+            _matrixBuffer.Flush();
         }
+
+        public void SetMaterial(Color color, Vector3 normal)
+        {
+            _materialBuffer.Value.MaterialColor = color;
+            _materialBuffer.Value.Normal = normal;
+            _materialBuffer.Flush();
+        }
+
+        public void FlushLight() => _lightBuffer.Flush();
 
         public void SetStripIndices() => _indexBuffer.Write(_stripIndices);
 
@@ -181,34 +209,19 @@ namespace Symirror3.Rendering
                 .ToArray();
         }
 
-        private const string ShaderCode =
-@"cbuffer cbWorldTransform : register(b0) {
-    matrix WorldViewProj;
-};
-
-struct VS_INPUT {
-    float4 Pos : POSITION;
-    float4 Col : COLOR;
-};
-
-struct PS_INPUT {
-    float4 Pos : SV_POSITION;
-    float4 Col : COLOR;
-};
-
-PS_INPUT VS(VS_INPUT input)
-{
-    PS_INPUT output;
-
-    output.Pos = mul(input.Pos, WorldViewProj);
-    output.Col = input.Col;
-
-    return output;
-}
-
-float4 PS(PS_INPUT input) : SV_TARGET
-{
-    return input.Col;
-}";
+        private static byte[] ShaderCode
+        {
+            get
+            {
+                using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Symirror3.Rendering.shader.hlsl");
+                if (stream is null) return Array.Empty<byte>();
+                // skip BOM
+                stream.Seek(3, System.IO.SeekOrigin.Begin);
+                // 1 longer because appending '\0' end
+                var buffer = new byte[stream.Length - 2];
+                stream.Read(buffer.AsSpan());
+                return buffer;
+            }
+        }
     }
 }

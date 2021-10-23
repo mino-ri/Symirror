@@ -11,6 +11,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="shader.hlsl" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="shader.hlsl" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Symirror3.Core\Symirror3.Core.csproj" />
   </ItemGroup>
 

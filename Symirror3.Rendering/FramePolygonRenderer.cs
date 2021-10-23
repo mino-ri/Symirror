@@ -43,7 +43,7 @@ namespace Symirror3.Rendering
             if (vertexCount < 3)
                 return;
 
-            var color = GetLightedColor(polygon, graphics);
+            SetMaterial(polygon, graphics);
 
             for (var i = 0; i < vertexCount; i++)
             {
@@ -59,9 +59,6 @@ namespace Symirror3.Rendering
                 if ((vertices[i * 2].Vector - center).Length() < (vertices[i * 2 + 1].Vector - center).Length())
                     vertices[i * 2].Vector = center;
             }
-
-            for (int i = 0; i < vertexCount * 2; i++)
-                vertices[i].Color = color;
 
             vertices[vertexCount * 2] = vertices[0];
             vertices[vertexCount * 2 + 1] = vertices[1];

@@ -19,7 +19,7 @@ namespace Symirror3.Rendering
 
         public static Line FromPoints(Vector3 p1, Vector3 p2)
         {
-            if (Vector3Operator.ApproximatelyEqual(p1, p2, Error))
+            if (p1 == p2)
                 throw new InvalidOperationException();
             return new Line(p1.Y - p2.Y, p2.X - p1.X, p1.X * p2.Y - p2.X * p1.Y);
         }

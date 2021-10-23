@@ -25,16 +25,15 @@ namespace Symirror3.Rendering
             if (polygon.Vertices.Length < 3)
                 return;
 
-            var color = GetLightedColor(polygon, graphics);
             var vertices = graphics.Vertices;
             if (polygon.Vertices.Length == 3)
             {
                 for (var i = 0; i < 3; i++)
                 {
                     vertices[i].Vector = polygon.Vertices[i].Vector;
-                    vertices[i].Color = color;
                 }
 
+                SetMaterial(polygon, graphics);
                 graphics.DrawList(1);
             }
             else
@@ -57,13 +56,14 @@ namespace Symirror3.Rendering
                 if (_vertices.Count < 3)
                     return;
 
+                SetMaterial(polygon, graphics);
+
                 // 3角形は特別な処理をせず描画
                 if (_vertices.Count == 3)
                 {
                     for (var i = 0; i < 3; i++)
                     {
                         vertices[i].Vector = _vertices[i];
-                        vertices[i].Color = color;
                     }
 
                     graphics.DrawList(1);
@@ -115,9 +115,6 @@ namespace Symirror3.Rendering
                     vertices[i * 3].Vector = Vector3.Transform(_middles[i] ?? Vector3.Zero, quot) + center;
                     vertices[i * 3 + 1].Vector = Vector3.Transform(_middles[Before(i)] ?? _point2D[i], quot) + center;
                     vertices[i * 3 + 2].Vector = Vector3.Transform(_middles[After(i)] ?? _point2D[After(i)], quot) + center;
-                    vertices[i * 3].Color = color;
-                    vertices[i * 3 + 1].Color = color;
-                    vertices[i * 3 + 2].Color = color;
                 }
 
                 graphics.DrawList(_vertices.Count);

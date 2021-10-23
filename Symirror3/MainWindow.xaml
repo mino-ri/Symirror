@@ -69,7 +69,7 @@
             <ListBox ItemsSource="{Binding AllSymbols, Mode=OneTime}" SelectedValue="{Binding Symbol}" Margin="0,3,0,0" />
         </DockPanel>
         <StackPanel Orientation="Vertical" Margin="0,4,4,4">
-            <GroupBox Header="{Binding Path=Language.Texts[FacesVisiblility],Mode=OneWay}" Margin="0,2">
+            <GroupBox Header="{Binding Path=Language.Texts[FacesVisiblility],Mode=OneWay}" Margin="0">
                 <StackPanel Orientation="Vertical">
                     <Grid>
                         <Grid.Resources>
@@ -101,21 +101,36 @@
                             <CheckBox IsChecked="{Binding FaceVisible4}" />
                         </Border>
                     </Grid>
-                    <ComboBox ItemsSource="{Binding AllFaceViewTypes,Mode=OneTime}" SelectedValue="{Binding FaceViewType}" DisplayMemberPath="ViewText" Margin="0,3" />
-                    <ComboBox ItemsSource="{Binding AllFaceRenderTypes,Mode=OneTime}" SelectedValue="{Binding FaceRenderType}" DisplayMemberPath="ViewText" Margin="0,3" />
+                    <ComboBox ItemsSource="{Binding AllFaceViewTypes,Mode=OneTime}" SelectedValue="{Binding FaceViewType}" DisplayMemberPath="ViewText" Margin="0,1" />
+                    <ComboBox ItemsSource="{Binding AllFaceRenderTypes,Mode=OneTime}" SelectedValue="{Binding FaceRenderType}" DisplayMemberPath="ViewText" Margin="0,1" />
                 </StackPanel>
             </GroupBox>
-            <TextBlock>
+            <GroupBox Header="{Binding Path=Language.Texts[LightSetting],Mode=OneWay}" Margin="0">
+                <StackPanel Orientation="Vertical">
+                    <ComboBox ItemsSource="{Binding LightParameters, Mode=OneTime}"
+                              DisplayMemberPath="ViewText"
+                              SelectedIndex="0"
+                              IsSynchronizedWithCurrentItem="True"
+                              Margin="0,1" />
+                    <TextBlock>
+                        <Run Text="{Binding Path=LightParameters/ViewText,Mode=OneWay}"/>:
+                        <Run Text="{Binding Path=LightParameters/ParameterValue,Mode=OneWay}"/>
+                    </TextBlock>
+                    <Slider Minimum="0" Maximum="100" Value="{Binding Path=LightParameters/ParameterValue}"
+                            IsSnapToTickEnabled="True" TickFrequency="1" />
+                </StackPanel>
+            </GroupBox>
+            <!--<TextBlock>
                 <Run Text="{Binding Path=Language.Texts[LightFactor],Mode=OneWay}"/><Run Text="{Binding Light,Mode=OneWay}"/>
             </TextBlock>
             <Slider Minimum="0" Maximum="100" Value="{Binding Light}" IsSnapToTickEnabled="True" TickFrequency="1" />
             <TextBlock>
                 <Run Text="{Binding Path=Language.Texts[ShadowFactor],Mode=OneWay}"/><Run Text="{Binding Shadow,Mode=OneWay}"/>
             </TextBlock>
-            <Slider Minimum="0" Maximum="100" Value="{Binding Shadow}" IsSnapToTickEnabled="True" TickFrequency="1" />
-            <CheckBox Content="{Binding Path=Language.Texts[AutoRotation],Mode=OneWay}" IsChecked="{Binding AutoRotation}" Margin="0,6,0,0"/>
-            <Button Content="{Binding Path=Language.Texts[ResetRotation],Mode=OneWay}" Command="{Binding ResetRotationCommand}" Margin="0,3,0,0" />
-            <ComboBox DockPanel.Dock="Bottom" Margin="0,3,0,0"
+            <Slider Minimum="0" Maximum="100" Value="{Binding Shadow}" IsSnapToTickEnabled="True" TickFrequency="1" />-->
+            <CheckBox Content="{Binding Path=Language.Texts[AutoRotation],Mode=OneWay}" IsChecked="{Binding AutoRotation}" Margin="0,3,0,0"/>
+            <Button Content="{Binding Path=Language.Texts[ResetRotation],Mode=OneWay}" Command="{Binding ResetRotationCommand}" Margin="0,2,0,0" />
+            <ComboBox DockPanel.Dock="Bottom" Margin="0,2,0,0"
                       ItemsSource="{Binding AllLanguages,Mode=OneTime}"
                       SelectedItem="{Binding Language,Mode=TwoWay}" />
         </StackPanel>
