@@ -142,7 +142,7 @@ namespace Symirror3.Rendering
                     _graphics.LightBuffer.SpecularIndex = (msg.Value + 5) / 5f;
                     break;
                 case LightParameter.LightSourceDistance:
-                    _graphics.LightBuffer.LightSource = _lightDirection * (msg.Value / 5f);
+                    _graphics.SetLightDistance((msg.Value + 6) / 5f);
                     break;
             }
             _graphics.FlushLight();

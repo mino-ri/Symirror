@@ -22,12 +22,14 @@ namespace Symirror3.Rendering
     [StructLayout(LayoutKind.Sequential)]
     internal struct LightBuffer
     {
-        public Vector4 Sight;
+        public Vector3 Sight;
+        public float _;
         public Vector3 LightSource;
-        public float LightSourceRhw;
+        public float ViewSize;
         public float AmbientFactor;
         public float DiffuseFactor;
         public float SpecularFactor;
         public float SpecularIndex;
+        public Matrix4 LightViewProj;
     }
 }

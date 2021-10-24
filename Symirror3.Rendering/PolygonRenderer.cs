@@ -4,6 +4,7 @@ using System.Numerics;
 using Symirror3.Core.Polyhedrons;
 using Symirror3.Core.Symmetry;
 using IndirectX;
+using System.Linq;
 
 namespace Symirror3.Rendering
 {
@@ -20,7 +21,23 @@ namespace Symirror3.Rendering
 
         public void Render(IEnumerable<PolyhedronFace<Vector3>> polyhedron, Graphics graphics)
         {
-            foreach (var polygon in polyhedron)
+            var faces = polyhedron.ToArray();
+
+            try
+            {
+                graphics.BeginShadowMap();
+                graphics.ClearShadowDepth();
+                foreach (var polygon in faces)
+                {
+                    RenderCore(polygon, graphics);
+                }
+            }
+            finally
+            {
+                graphics.EndShadowMap();
+            }
+
+            foreach (var polygon in faces)
             {
                 RenderCore(polygon, graphics);
             }
