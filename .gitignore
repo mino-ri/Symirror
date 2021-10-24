@@ -10,3 +10,4 @@ packages
 /**/obj/*
 /Debug/*
 /generated/*
+/Release/*.zip
