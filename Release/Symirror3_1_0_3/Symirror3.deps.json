@@ -59,14 +59,6 @@
             "fileVersion": "1.0.0.0"
           }
         }
-      },
-      "IndirectX.D3DCompiler/1.0.0.0": {
-        "runtime": {
-          "IndirectX.D3DCompiler.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
       }
     }
   },
@@ -102,11 +94,6 @@
       "sha512": ""
     },
     "IndirectX.Dxgi/1.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "IndirectX.D3DCompiler/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
