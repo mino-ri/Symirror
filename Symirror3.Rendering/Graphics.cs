@@ -45,24 +45,17 @@ namespace Symirror3.Rendering
             _width = width;
             _height = height;
             _graphics = new IndirectX.EasyRenderer.Graphics(surfaceHandle, width, height, true, 60, 1, useStencil: true);
-            using (var shader = new ShaderSource(ShaderCode,
-                new()
-                {
-                    [ShaderStages.VertexShader] = ("VS", "vs_5_0"),
-                },
-                new InputElementDesc { SemanticName = "POSITION", Format = Format.R32G32B32A32Float },
-                new InputElementDesc { SemanticName = "COLOR", Format = Format.R32G32B32A32Float, AlignedByteOffset = 16 }))
-            {
-                _vertexShader = _graphics.CompileVertexShader(shader, "VS", "vs_5_0");
-                _shadowMapVertexShader = _graphics.CompileVertexShader(shader, "VS_ShadowMap", "vs_5_0");
-                _pixelShader = _graphics.CompilePixelShader(shader, "PS", "ps_5_0");
+            _vertexShader = _graphics.CompileVertexShader(GetResource("vs.cfx"));
+            _shadowMapVertexShader = _graphics.CompileVertexShader(GetResource("vs_shadow.cfx"));
+            _pixelShader = _graphics.CompilePixelShader(GetResource("ps.cfx"));
 #if SHADOW_DEBUG
-                _shadowMapPixelShader = _graphics.CompilePixelShader(shader, "PS_ShadowMap", "ps_5_0");
+            _shadowMapPixelShader = _graphics.CompilePixelShader(GetResource("ps_shadow.cfx"));
 #endif
-                _graphics.Set(shader);
-                _graphics.Context.VertexShader.Shader = _vertexShader;
-                _graphics.Context.PixelShader.Shader = _pixelShader;
-            }
+            _graphics.SetInputLayout(GetResource("vsi.cfx"),
+                new InputElementDesc { SemanticName = "POSITION", Format = Format.R32G32B32A32Float },
+                new InputElementDesc { SemanticName = "COLOR", Format = Format.R32G32B32A32Float, AlignedByteOffset = 16 });
+            _graphics.Context.VertexShader.Shader = _vertexShader;
+            _graphics.Context.PixelShader.Shader = _pixelShader;
 
             _vertexBuffer = _graphics.RegisterVertexBuffer<Vertex>(0, TriangleCount * 3);
             _indexBuffer = _graphics.RegisterIndexBuffer(TriangleCount * 3);
@@ -314,19 +307,13 @@ namespace Symirror3.Rendering
                 .ToArray();
         }
 
-        private static byte[] ShaderCode
+        private static byte[] GetResource(string name)
         {
-            get
-            {
-                using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Symirror3.Rendering.shader.hlsl");
-                if (stream is null) return Array.Empty<byte>();
-                // skip BOM
-                stream.Seek(3, System.IO.SeekOrigin.Begin);
-                // 1 longer because appending '\0' end
-                var buffer = new byte[stream.Length - 2];
-                stream.Read(buffer.AsSpan());
-                return buffer;
-            }
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Symirror3.Rendering." + name);
+            if (stream is null) throw new ArgumentException("Invalid resource", nameof(name));
+            var buffer = new byte[stream.Length];
+            stream.Read(buffer.AsSpan());
+            return buffer;
         }
     }
 }

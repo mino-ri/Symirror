@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -11,11 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="shader.hlsl" />
+    <None Remove="*.cfx" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="shader.hlsl" />
+    <EmbeddedResource Include="*.cfx" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,9 +28,6 @@
     </Reference>
     <Reference Include="IndirectX.D3D11">
       <HintPath>..\libraries\IndirectX.D3D11.dll</HintPath>
-    </Reference>
-    <Reference Include="IndirectX.D3DCompiler">
-      <HintPath>..\libraries\IndirectX.D3DCompiler.dll</HintPath>
     </Reference>
     <Reference Include="IndirectX.Dxgi">
       <HintPath>..\libraries\IndirectX.Dxgi.dll</HintPath>
