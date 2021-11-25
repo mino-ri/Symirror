@@ -1,29 +1,28 @@
-﻿using System;
+﻿using Symirror3.Core.Symmetry;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Symirror3.Core.Symmetry;
 
-namespace Symirror3.Core.Polyhedrons
+namespace Symirror3.Core.Polyhedrons;
+
+public class SymmetrySourcePolyhedron<T> : PolyhedronBase<T>
 {
-    public class SymmetrySourcePolyhedron<T> : PolyhedronBase<T>
+    public SymmetrySourcePolyhedron(SymmetryGroup symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
+
+    protected override IEnumerable<PolyhedronVertex<T>> GetVertices(SymmetryGroup symmetry)
     {
-        public SymmetrySourcePolyhedron(SymmetryGroup symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
+        return symmetry.Vertices.Select(v => new PolyhedronVertex<T>(_opr.Convert(v.Point), v));
+    }
 
-        protected override IEnumerable<PolyhedronVertex<T>> GetVertices(SymmetryGroup symmetry)
-        {
-            return symmetry.Vertices.Select(v => new PolyhedronVertex<T>(_opr.Convert(v.Point), v));
-        }
+    protected override IEnumerable<PolyhedronFace<T>> GetFaces(SymmetryGroup symmetry)
+    {
+        return symmetry
+            .Faces
+            .Select(f => new PolyhedronFace<T>(f, f.Select(v => Vertices[v.Index])));
+    }
 
-        protected override IEnumerable<PolyhedronFace<T>> GetFaces(SymmetryGroup symmetry)
-        {
-            return symmetry
-                .Faces
-                .Select(f => new PolyhedronFace<T>(f, f.Select(v => Vertices[v.Index])));
-        }
-
-        protected override void OnBasePointChanged(SphericalPoint value)
-        {
-            // do nothing
-        }
+    protected override void OnBasePointChanged(SphericalPoint value)
+    {
+        // do nothing
     }
 }

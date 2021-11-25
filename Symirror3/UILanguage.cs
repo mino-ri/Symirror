@@ -1,32 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using Symirror3.Core.Polyhedrons;
+﻿using Symirror3.Core.Polyhedrons;
 using Symirror3.Rendering;
+using System;
+using System.Collections.Generic;
 
-namespace Symirror3
+namespace Symirror3;
+
+public enum UIText
 {
-    public enum UIText
+    Symmetry,
+    PolyhedronType,
+    FacesVisiblility,
+    LightSetting,
+    AutoRotation,
+    ResetRotation,
+}
+
+public class UILanguage
+{
+    public string Language { get; init; } = "";
+
+    public Dictionary<UIText, string> Texts { get; } = new();
+
+    public Dictionary<Enum, string> EnumNames { get; } = new();
+
+    public override string ToString() => Language;
+
+    public static UILanguage[] Default { get; } =
     {
-        Symmetry,
-        PolyhedronType,
-        FacesVisiblility,
-        LightSetting,
-        AutoRotation,
-        ResetRotation,
-    }
-
-    public class UILanguage
-    {
-        public string Language { get; init; } = "";
-
-        public Dictionary<UIText, string> Texts { get; } = new();
-
-        public Dictionary<Enum, string> EnumNames { get; } = new();
-
-        public override string ToString() => Language;
-
-        public static UILanguage[] Default { get; } =
-        {
             new UILanguage
             {
                 Language = "English",
@@ -98,5 +98,4 @@ namespace Symirror3
                 },
             },
         };
-    }
 }
