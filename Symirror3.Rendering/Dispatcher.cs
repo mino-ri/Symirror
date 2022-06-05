@@ -29,6 +29,7 @@ public sealed class Dispatcher : IDisposable
     private PolyhedronBase<Vector3> _polyhedron;
     private PolygonRenderer _renderer;
     private readonly PolygonFilter _filter;
+    private int[] _colorIndices = new[] { 0, 1, 2, 3, 4 };
 
     public SymmetryGroup Symmetry => _polyhedronSelector.Symmetry;
 
@@ -41,7 +42,7 @@ public sealed class Dispatcher : IDisposable
         _polyhedron = _polyhedronSelector.GetPolyhedron(PolyhedronType.Normal);
         _renderer = new StandardPolygonRenderer();
         _filter = new PolygonFilter();
-        _renderer.OnActivate(_graphics);
+        _renderer.OnActivate(_graphics, _colorIndices);
     }
 
     private void ChangeBasePoint(in SphericalPoint p)
@@ -260,7 +261,13 @@ public sealed class Dispatcher : IDisposable
             FaceRenderType.EvenOdd => new EvenOddPolygonRenderer(),
             _ => new StandardPolygonRenderer(),
         };
-        _renderer.OnActivate(_graphics);
+        _renderer.OnActivate(_graphics, _colorIndices);
+    }
+
+    private void HandleMessageCore(ChangeColorIndices msg)
+    {
+        _colorIndices = msg.ColorIndices;
+        _renderer.OnActivate(_graphics, _colorIndices);
     }
 
 #pragma warning disable CA1822 // メンバーを static に設定します

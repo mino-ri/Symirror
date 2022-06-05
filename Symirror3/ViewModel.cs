@@ -20,6 +20,21 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
     private readonly System.Windows.Threading.Dispatcher _viewDispatcher;
     private readonly Dispatcher _dispatcher;
     private readonly GeneratorMap _generatorMap;
+    private static readonly Brush[] _brushes =
+    {
+        ColorBrush(0x03, 0xAF, 0x7A),
+        ColorBrush(0xFF, 0xD7, 0x00),
+        ColorBrush(0xFF, 0x4B, 0x0A),
+        ColorBrush(0x4D, 0xC4, 0xFF),
+        ColorBrush(0x00, 0x5A, 0xFF),
+    };
+
+    private static Brush ColorBrush(byte r, byte g, byte b)
+    {
+        var brush = new SolidColorBrush(Color.FromRgb(r, g, b));
+        brush.Freeze();
+        return brush;
+    }
 
     public UILanguage[] AllLanguages => UILanguage.Default;
     private UILanguage _language = UILanguage.Default[0];
@@ -75,6 +90,40 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
         get => _faceVisibles[4];
         set => SetValue(ref _faceVisibles[4], value, _ => new ChangeFaceVisible(_faceVisibles));
     }
+
+    private readonly int[] _colorIndices = new[] { 0, 1, 2, 3, 4 };
+
+    public Brush FaceBrush0 => _brushes[_colorIndices[0]];
+    public Brush FaceBrush1 => _brushes[_colorIndices[1]];
+    public Brush FaceBrush2 => _brushes[_colorIndices[2]];
+    public Brush FaceBrush3 => _brushes[_colorIndices[3]];
+    public Brush FaceBrush4 => _brushes[_colorIndices[4]];
+
+    private void ChangeColor(object? arg, int colorIndex)
+    {
+        var index = arg as int? ?? int.Parse(arg?.ToString() ?? "");
+        if (_colorIndices[index] != colorIndex)
+        {
+            _colorIndices[index] = colorIndex;
+            OnPropertyChanged("FaceBrush" + index);
+            _dispatcher.SendMessage(new ChangeColorIndices(_colorIndices));
+        }
+    }
+
+    public ICommand ChangeColor0Command { get; }
+    public void ChangeColor0(object? arg) => ChangeColor(arg, 0);
+
+    public ICommand ChangeColor1Command { get; }
+    public void ChangeColor1(object? arg) => ChangeColor(arg, 1);
+
+    public ICommand ChangeColor2Command { get; }
+    public void ChangeColor2(object? arg) => ChangeColor(arg, 2);
+
+    public ICommand ChangeColor3Command { get; }
+    public void ChangeColor3(object? arg) => ChangeColor(arg, 3);
+
+    public ICommand ChangeColor4Command { get; }
+    public void ChangeColor4(object? arg) => ChangeColor(arg, 4);
 
     public EnumValue<PType>[] AllPolyhedronTypes { get; }
     private EnumValue<PType> _polyhedronType;
@@ -199,6 +248,11 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
         AllFaceRenderTypes = GetEnums<FaceRenderType>();
         _faceRenderType = AllFaceRenderTypes[0];
         ResetRotationCommand = new ActionCommand(ResetRotation);
+        ChangeColor0Command = new ActionCommand(ChangeColor0);
+        ChangeColor1Command = new ActionCommand(ChangeColor1);
+        ChangeColor2Command = new ActionCommand(ChangeColor2);
+        ChangeColor3Command = new ActionCommand(ChangeColor3);
+        ChangeColor4Command = new ActionCommand(ChangeColor4);
 
         _viewDispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
         _generatorMap = new GeneratorMap(mapSize, dpiScale, SymmetryTriangle.Create(_symbol), _polyhedronType.Value);
@@ -238,9 +292,15 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
         return true;
     }
 
-    private void SetValue<T>(ref T storage, T value, Func<T, IMessage> action, [CallerMemberName] string propertyName = "")
+    private bool SetValue<T>(ref T storage, T value, Func<T, IMessage> action, [CallerMemberName] string propertyName = "")
     {
-        if (SetValue(ref storage, value, propertyName)) _dispatcher.SendMessage(action(value));
+        if (SetValue(ref storage, value, propertyName))
+        {
+            _dispatcher.SendMessage(action(value));
+            return true;
+        }
+
+        return false;
     }
 
     public void Dispose() => _dispatcher.Dispose();

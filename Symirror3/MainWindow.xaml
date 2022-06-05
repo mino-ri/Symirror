@@ -15,6 +15,21 @@
         ContentRendered="Window_ContentRendered"
         Closing="Window_Closing"
         Activated="Window_Activated">
+    <Window.Resources>
+        <ContextMenu x:Key="ColorContextMenu" x:Shared="false"
+                     DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+            <MenuItem Foreground="#03AF7A" Header="■" Command="{Binding ChangeColor0Command}"
+                      CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+            <MenuItem Foreground="#FFD700" Header="■" Command="{Binding ChangeColor1Command}"
+                      CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+            <MenuItem Foreground="#FF4B0A" Header="■" Command="{Binding ChangeColor2Command}"
+                      CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+            <MenuItem Foreground="#4DC4FF" Header="■" Command="{Binding ChangeColor3Command}"
+                      CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+            <MenuItem Foreground="#005AFF" Header="■" Command="{Binding ChangeColor4Command}"
+                      CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+        </ContextMenu>
+    </Window.Resources>
     <DockPanel Width="768" Height="512">
         <WindowsFormsHost Width="512" Height="512" DockPanel.Dock="Left" Background="Black" Cursor="SizeAll"
                           Focusable="False">
@@ -85,20 +100,20 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Border Height="22" Background="#03AF7A" CornerRadius="2" Margin="1">
-                            <CheckBox IsChecked="{Binding FaceVisible0}" />
+                        <Border Height="22" Background="{Binding FaceBrush0}" CornerRadius="2" Margin="1">
+                            <CheckBox IsChecked="{Binding FaceVisible0}" Tag="0" ContextMenu="{StaticResource ColorContextMenu}" />
                         </Border>
-                        <Border Height="22" Background="#FFD700" CornerRadius="2" Margin="1" Grid.Column="1">
-                            <CheckBox IsChecked="{Binding FaceVisible1}" />
+                        <Border Height="22" Background="{Binding FaceBrush1}" CornerRadius="2" Margin="1" Grid.Column="1">
+                            <CheckBox IsChecked="{Binding FaceVisible1}" Tag="1" ContextMenu="{StaticResource ColorContextMenu}" />
                         </Border>
-                        <Border Height="22" Background="#FF4B0A" CornerRadius="2" Margin="1" Grid.Column="2">
-                            <CheckBox IsChecked="{Binding FaceVisible2}" />
+                        <Border Height="22" Background="{Binding FaceBrush2}" CornerRadius="2" Margin="1" Grid.Column="2">
+                            <CheckBox IsChecked="{Binding FaceVisible2}" Tag="2" ContextMenu="{StaticResource ColorContextMenu}" />
                         </Border>
-                        <Border Height="22" Background="#4DC4FF" CornerRadius="2" Margin="1" Grid.Column="3">
-                            <CheckBox IsChecked="{Binding FaceVisible3}" />
+                        <Border Height="22" Background="{Binding FaceBrush3}" CornerRadius="2" Margin="1" Grid.Column="3">
+                            <CheckBox IsChecked="{Binding FaceVisible3}" Tag="3" ContextMenu="{StaticResource ColorContextMenu}" />
                         </Border>
-                        <Border Height="22" Background="#005AFF" CornerRadius="2" Margin="1" Grid.Column="4">
-                            <CheckBox IsChecked="{Binding FaceVisible4}" />
+                        <Border Height="22" Background="{Binding FaceBrush4}" CornerRadius="2" Margin="1" Grid.Column="4">
+                            <CheckBox IsChecked="{Binding FaceVisible4}" Tag="4" ContextMenu="{StaticResource ColorContextMenu}" />
                         </Border>
                     </Grid>
                     <ComboBox ItemsSource="{Binding AllFaceViewTypes,Mode=OneTime}" SelectedValue="{Binding FaceViewType}" DisplayMemberPath="ViewText" Margin="0,1" />

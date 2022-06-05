@@ -5,7 +5,7 @@ namespace Symirror3.Rendering;
 
 internal class EvenOddPolygonRenderer : PolygonRenderer
 {
-    public override void OnActivate(Graphics graphics)
+    protected override void OnActivateCore(Graphics graphics)
     {
         graphics.SetFanIndices();
     }

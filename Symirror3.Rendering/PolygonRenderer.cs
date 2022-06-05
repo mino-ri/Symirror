@@ -10,14 +10,16 @@ namespace Symirror3.Rendering;
 
 internal abstract class PolygonRenderer
 {
-    protected static readonly Color[] Colors =
+    private static readonly Color[] Colors =
     {
-            new Color(0xFF03AF7A),
-            new Color(0xFFFFD700),
-            new Color(0xFFFF4B0A),
-            new Color(0xFF4DC4FF),
-            new Color(0xFF005AFF),
-        };
+        new Color(0xFF03AF7A),
+        new Color(0xFFFFD700),
+        new Color(0xFFFF4B0A),
+        new Color(0xFF4DC4FF),
+        new Color(0xFF005AFF),
+    };
+
+    private int[] ColorIndices = new int[] { 0, 1, 2, 3, 4 };
 
     public void Render(IEnumerable<PolyhedronFace<Vector3>> polyhedron, Graphics graphics)
     {
@@ -43,7 +45,13 @@ internal abstract class PolygonRenderer
         }
     }
 
-    public abstract void OnActivate(Graphics graphics);
+    public void OnActivate(Graphics graphics, int[] colorIndexes)
+    {
+        ColorIndices = colorIndexes;
+        OnActivateCore(graphics);
+    }
+
+    protected abstract void OnActivateCore(Graphics graphics);
 
     protected abstract void RenderCore(PolyhedronFace<Vector3> polygon, Graphics graphics);
 
@@ -77,14 +85,14 @@ internal abstract class PolygonRenderer
 
     /// <summary>指定された対称性要素に割り当てられた色を取得します。</summary>
     /// <param name="symmetryElement">色を取得する対称性要素</param>
-    protected static Color GetBaseColor(ISymmetryElement symmetryElement)
+    protected Color GetBaseColor(ISymmetryElement symmetryElement)
     {
-        return symmetryElement.ElementCategory == SymmetryElementCategory.Face
-            ? Colors[(symmetryElement.ElementType + 3) % Colors.Length]
-            : Colors[symmetryElement.ElementType % Colors.Length];
+        return Colors[symmetryElement.ElementCategory == SymmetryElementCategory.Face
+            ? ColorIndices[(symmetryElement.ElementType + 3) % ColorIndices.Length]
+            : ColorIndices[symmetryElement.ElementType % ColorIndices.Length]];
     }
 
-    protected static void SetMaterial(PolyhedronFace<Vector3> polygon, Graphics graphics)
+    protected void SetMaterial(PolyhedronFace<Vector3> polygon, Graphics graphics)
     {
         graphics.SetMaterial(GetBaseColor(polygon.SymmetryElement), GetNormal(polygon, graphics));
     }

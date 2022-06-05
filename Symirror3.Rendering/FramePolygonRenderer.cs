@@ -10,7 +10,7 @@ internal class FramePolygonRenderer : PolygonRenderer
 {
     private readonly List<Vector3> _renderingList = new(Graphics.TriangleCount);
 
-    public override void OnActivate(Graphics graphics)
+    protected override void OnActivateCore(Graphics graphics)
     {
         graphics.IgnoreStencil();
         graphics.SetStripIndices();

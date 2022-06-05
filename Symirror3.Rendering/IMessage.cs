@@ -32,6 +32,8 @@ public record ChangeFaceViewType(FaceViewType FaceViewType) : IMessage;
 
 public record ChangeFaceRenderType(FaceRenderType FaceRenderType) : IMessage;
 
+public record ChangeColorIndices(int[] ColorIndices) : IMessage;
+
 public enum LightParameter
 {
     AmbientLight,

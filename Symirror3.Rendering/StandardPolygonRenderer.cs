@@ -13,7 +13,7 @@ internal class StandardPolygonRenderer : PolygonRenderer
     private readonly Line[] _edges = new Line[Graphics.TriangleCount];
     private readonly List<Vector3> _vertices = new(Graphics.TriangleCount);
 
-    public override void OnActivate(Graphics graphics)
+    protected override void OnActivateCore(Graphics graphics)
     {
         graphics.IgnoreStencil();
         graphics.SetFanIndices();
