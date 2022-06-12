@@ -12,14 +12,17 @@ internal abstract class PolygonRenderer
 {
     private static readonly Color[] Colors =
     {
-        new Color(0xFF03AF7A),
-        new Color(0xFFFFD700),
+        new Color(0xFF804000),
         new Color(0xFFFF4B0A),
+        new Color(0xFFF6AA00),
+        new Color(0xFFFFD700),
+        new Color(0xFF03AF7A),
         new Color(0xFF4DC4FF),
-        new Color(0xFF005AFF),
+        new Color(0xFF0C65F0),
+        new Color(0xFFA000A0),
     };
 
-    private int[] ColorIndices = new int[] { 0, 1, 2, 3, 4 };
+    private int[] ColorIndices = new int[] { 4, 3, 1, 5, 6 };
 
     public void Render(IEnumerable<PolyhedronFace<Vector3>> polyhedron, Graphics graphics)
     {

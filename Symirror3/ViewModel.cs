@@ -22,11 +22,14 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
     private readonly GeneratorMap _generatorMap;
     private static readonly Brush[] _brushes =
     {
-        ColorBrush(0x03, 0xAF, 0x7A),
-        ColorBrush(0xFF, 0xD7, 0x00),
+        ColorBrush(0x80, 0x40, 0x00),
         ColorBrush(0xFF, 0x4B, 0x0A),
+        ColorBrush(0xF6, 0xAA, 0x00),
+        ColorBrush(0xFF, 0xD7, 0x00),
+        ColorBrush(0x03, 0xAF, 0x7A),
         ColorBrush(0x4D, 0xC4, 0xFF),
-        ColorBrush(0x00, 0x5A, 0xFF),
+        ColorBrush(0x0C, 0x65, 0xF0),
+        ColorBrush(0xA0, 0x00, 0xA0),
     };
 
     private static Brush ColorBrush(byte r, byte g, byte b)
@@ -91,7 +94,7 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
         set => SetValue(ref _faceVisibles[4], value, _ => new ChangeFaceVisible(_faceVisibles));
     }
 
-    private readonly int[] _colorIndices = new[] { 0, 1, 2, 3, 4 };
+    private readonly int[] _colorIndices = new[] { 4, 3, 1, 5, 6 };
 
     public Brush FaceBrush0 => _brushes[_colorIndices[0]];
     public Brush FaceBrush1 => _brushes[_colorIndices[1]];
@@ -124,6 +127,15 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
 
     public ICommand ChangeColor4Command { get; }
     public void ChangeColor4(object? arg) => ChangeColor(arg, 4);
+
+    public ICommand ChangeColor5Command { get; }
+    public void ChangeColor5(object? arg) => ChangeColor(arg, 5);
+
+    public ICommand ChangeColor6Command { get; }
+    public void ChangeColor6(object? arg) => ChangeColor(arg, 6);
+
+    public ICommand ChangeColor7Command { get; }
+    public void ChangeColor7(object? arg) => ChangeColor(arg, 7);
 
     public EnumValue<PType>[] AllPolyhedronTypes { get; }
     private EnumValue<PType> _polyhedronType;
@@ -253,18 +265,21 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
         ChangeColor2Command = new ActionCommand(ChangeColor2);
         ChangeColor3Command = new ActionCommand(ChangeColor3);
         ChangeColor4Command = new ActionCommand(ChangeColor4);
+        ChangeColor5Command = new ActionCommand(ChangeColor5);
+        ChangeColor6Command = new ActionCommand(ChangeColor6);
+        ChangeColor7Command = new ActionCommand(ChangeColor7);
 
         _viewDispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
         _generatorMap = new GeneratorMap(mapSize, dpiScale, SymmetryTriangle.Create(_symbol), _polyhedronType.Value);
         _dispatcher = new Dispatcher(control.Handle, control.Width, control.Height, Symbol);
         LightParameters = new[]
         {
-                new LightParameterViewModel(LightParameter.AmbientLight, 15, this),
-                new LightParameterViewModel(LightParameter.DiffuseLight, 90, this),
-                new LightParameterViewModel(LightParameter.SpecularLight, 25, this),
-                new LightParameterViewModel(LightParameter.SpecularLightSharpness, 20, this),
-                new LightParameterViewModel(LightParameter.LightSourceDistance, 40, this),
-            };
+            new LightParameterViewModel(LightParameter.AmbientLight, 15, this),
+            new LightParameterViewModel(LightParameter.DiffuseLight, 90, this),
+            new LightParameterViewModel(LightParameter.SpecularLight, 25, this),
+            new LightParameterViewModel(LightParameter.SpecularLightSharpness, 20, this),
+            new LightParameterViewModel(LightParameter.LightSourceDistance, 40, this),
+        };
         _dispatcher.BasePointChanged += p => _viewDispatcher.Invoke(() =>
         {
             var vp = _generatorMap.ModelToDpi(p);
@@ -275,6 +290,7 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
         _dispatcher.SendMessage(new ChangeFaceRenderType(FaceRenderType.Value));
         _dispatcher.SendMessage(new ChangeFaceViewType(FaceViewType.Value));
         _dispatcher.SendMessage(new ChangeFaceVisible(_faceVisibles));
+        _dispatcher.SendMessage(new ChangeColorIndices(_colorIndices));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
