@@ -23,5 +23,5 @@ public class SymmetryVertex : ISymmetryElement
 
     /// <summary>このオブジェクトを、それと等価な文字列に変換します。</summary>
     /// <returns>現在のオブジェクトを表す<see cref="string"/>。</returns>
-    public override string ToString() => Point.ToString();
+    public override string ToString() => $"{ElementType} {Point}";
 }

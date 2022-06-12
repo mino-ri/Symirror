@@ -27,7 +27,7 @@ public abstract class PolyhedronBase<T>
     {
         Symmetry = symmetry;
         _opr = opr;
-        _basePoint = new SphericalPoint(0.0, 0.0, 1.0);
+        _basePoint = Symmetry[0][0].Point;
         Vertices = GetVertices(symmetry).ToArray();
         Faces = GetFaces(symmetry).ToArray();
         OnBasePointChanged(_basePoint);

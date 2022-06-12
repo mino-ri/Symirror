@@ -44,9 +44,9 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
         set => SetValue(ref _language, value);
     }
 
-    public SymmetrySymbol[] AllSymbols => SymmetrySymbol.AllSymbols;
+    public SymmetrySymbol[] AllSymbols => SymmetryTriangle.AllSymbols;
 
-    private SymmetrySymbol _symbol = SymmetrySymbol.AllSymbols[12];
+    private SymmetrySymbol _symbol = SymmetryTriangle.AllSymbols[12];
     public SymmetrySymbol Symbol
     {
         get => _symbol;
