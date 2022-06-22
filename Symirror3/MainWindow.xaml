@@ -22,17 +22,21 @@
                       CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
             <MenuItem Foreground="#FF4B0A" Header="■" Command="{Binding ChangeColor1Command}"
                       CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
-            <MenuItem Foreground="#F6AA00" Header="■" Command="{Binding ChangeColor2Command}"
+            <MenuItem Foreground="#FFD700" Header="■" Command="{Binding ChangeColor2Command}"
                       CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
-            <MenuItem Foreground="#FFD700" Header="■" Command="{Binding ChangeColor3Command}"
+            <MenuItem Foreground="#4ACC0A" Header="■" Command="{Binding ChangeColor3Command}"
                       CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
-            <MenuItem Foreground="#03AF7A" Header="■" Command="{Binding ChangeColor4Command}"
+            <MenuItem Foreground="#03AD58" Header="■" Command="{Binding ChangeColor4Command}"
                       CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
-            <MenuItem Foreground="#4DC4FF" Header="■" Command="{Binding ChangeColor5Command}"
+            <MenuItem Foreground="#40E0FF" Header="■" Command="{Binding ChangeColor5Command}"
                       CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
-            <MenuItem Foreground="#0C65F0" Header="■" Command="{Binding ChangeColor6Command}"
+            <MenuItem Foreground="#0070FF" Header="■" Command="{Binding ChangeColor6Command}"
                       CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
-            <MenuItem Foreground="#A000A0" Header="■" Command="{Binding ChangeColor7Command}"
+            <MenuItem Foreground="#C316F0" Header="■" Command="{Binding ChangeColor7Command}"
+                      CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+            <MenuItem Foreground="#FFFFFF" Header="■" Command="{Binding ChangeColor8Command}"
+                      CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+            <MenuItem Foreground="#C8C8CB" Header="■" Command="{Binding ChangeColor9Command}"
                       CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
         </ContextMenu>
     </Window.Resources>

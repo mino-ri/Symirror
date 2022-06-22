@@ -22,19 +22,24 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
     private readonly GeneratorMap _generatorMap;
     private static readonly Brush[] _brushes =
     {
-        ColorBrush(0x80, 0x40, 0x00),
-        ColorBrush(0xFF, 0x4B, 0x0A),
-        ColorBrush(0xF6, 0xAA, 0x00),
-        ColorBrush(0xFF, 0xD7, 0x00),
-        ColorBrush(0x03, 0xAF, 0x7A),
-        ColorBrush(0x4D, 0xC4, 0xFF),
-        ColorBrush(0x0C, 0x65, 0xF0),
-        ColorBrush(0xA0, 0x00, 0xA0),
+        ColorBrush(0x804000),
+        ColorBrush(0xFF4B0A),
+        ColorBrush(0xFFD700),
+        ColorBrush(0x4ACC0A),
+        ColorBrush(0x03AD58),
+        ColorBrush(0x40E0FF),
+        ColorBrush(0x0070FF),
+        ColorBrush(0xC316F0),
+        ColorBrush(0xFFFFFF),
+        ColorBrush(0xC8C8CB),
     };
 
-    private static Brush ColorBrush(byte r, byte g, byte b)
+    private static Brush ColorBrush(uint value)
     {
-        var brush = new SolidColorBrush(Color.FromRgb(r, g, b));
+        var brush = new SolidColorBrush(Color.FromRgb(
+            (byte)(value >> 16),
+            (byte)(value >> 8),
+            (byte)value));
         brush.Freeze();
         return brush;
     }
@@ -94,7 +99,7 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
         set => SetValue(ref _faceVisibles[4], value, _ => new ChangeFaceVisible(_faceVisibles));
     }
 
-    private readonly int[] _colorIndices = new[] { 4, 3, 1, 5, 6 };
+    private readonly int[] _colorIndices = new[] { 4, 2, 1, 5, 6 };
 
     public Brush FaceBrush0 => _brushes[_colorIndices[0]];
     public Brush FaceBrush1 => _brushes[_colorIndices[1]];
@@ -136,6 +141,12 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
 
     public ICommand ChangeColor7Command { get; }
     public void ChangeColor7(object? arg) => ChangeColor(arg, 7);
+
+    public ICommand ChangeColor8Command { get; }
+    public void ChangeColor8(object? arg) => ChangeColor(arg, 8);
+
+    public ICommand ChangeColor9Command { get; }
+    public void ChangeColor9(object? arg) => ChangeColor(arg, 9);
 
     public EnumValue<PType>[] AllPolyhedronTypes { get; }
     private EnumValue<PType> _polyhedronType;
@@ -268,6 +279,8 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
         ChangeColor5Command = new ActionCommand(ChangeColor5);
         ChangeColor6Command = new ActionCommand(ChangeColor6);
         ChangeColor7Command = new ActionCommand(ChangeColor7);
+        ChangeColor8Command = new ActionCommand(ChangeColor8);
+        ChangeColor9Command = new ActionCommand(ChangeColor9);
 
         _viewDispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
         _generatorMap = new GeneratorMap(mapSize, dpiScale, SymmetryTriangle.Create(_symbol), _polyhedronType.Value);
