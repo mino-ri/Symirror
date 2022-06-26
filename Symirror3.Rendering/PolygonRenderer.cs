@@ -26,7 +26,7 @@ internal abstract class PolygonRenderer
 
     private int[] ColorIndices = new int[] { 0, 1, 2, 3, 4 };
 
-    public void Render(IEnumerable<PolyhedronFace<Vector3>> polyhedron, Graphics graphics)
+    public virtual void Render(IEnumerable<PolyhedronFace<Vector3>> polyhedron, Graphics graphics)
     {
         var faces = polyhedron.ToArray();
 

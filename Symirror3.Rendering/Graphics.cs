@@ -235,6 +235,14 @@ internal sealed class Graphics : IDisposable
 
     public void SetFanIndices() => _indexBuffer.Write(_fanIndices);
 
+    public void SetIndices(ushort[] indices) => _indexBuffer.Write(indices);
+
+    public void SetIndices(Span<ushort> indices)
+    {
+        indices.CopyTo(_indexBuffer.Buffer);
+        _indexBuffer.Flush();
+    }
+
     public void IgnoreStencil() => _graphics.SetDepthStencilState(_ignoreStencilState, 0);
 
     public void BeginWriteStencil() => _graphics.SetDepthStencilState(_writeStencilState, 0);

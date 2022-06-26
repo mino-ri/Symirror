@@ -54,5 +54,6 @@ public enum FaceRenderType
 {
     Fill,
     EvenOdd,
+    GlobalEvenOdd,
     Frame,
 }

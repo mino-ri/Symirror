@@ -259,6 +259,7 @@ public sealed class Dispatcher : IDisposable
         {
             FaceRenderType.Frame => new FramePolygonRenderer(),
             FaceRenderType.EvenOdd => new EvenOddPolygonRenderer(),
+            FaceRenderType.GlobalEvenOdd => new GlobalEvenOddPolygonRenderer(),
             _ => new StandardPolygonRenderer(),
         };
         _renderer.OnActivate(_graphics, _colorIndices);

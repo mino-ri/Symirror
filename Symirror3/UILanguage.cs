@@ -1,4 +1,4 @@
-﻿using Symirror3.Core.Polyhedrons;
+using Symirror3.Core.Polyhedrons;
 using Symirror3.Rendering;
 using System;
 using System.Collections.Generic;
@@ -52,6 +52,7 @@ public class UILanguage
                     [FaceRenderType.Fill] = "Fill",
                     [FaceRenderType.Frame] = "Frame",
                     [FaceRenderType.EvenOdd] = "Even-odd fill",
+                    [FaceRenderType.GlobalEvenOdd] = "Global even-odd",
                     [FaceViewType.All] = "All",
                     [FaceViewType.OneEach] = "One for Each Type",
                     [FaceViewType.VertexFigure] = "Vertex Figure",
@@ -87,6 +88,7 @@ public class UILanguage
                     [FaceRenderType.Fill] = "塗りつぶし",
                     [FaceRenderType.Frame] = "枠",
                     [FaceRenderType.EvenOdd] = "偶奇塗り",
+                    [FaceRenderType.GlobalEvenOdd] = "包括的偶奇塗り",
                     [FaceViewType.All] = "全て表示",
                     [FaceViewType.OneEach] = "各1枚ずつ",
                     [FaceViewType.VertexFigure] = "頂点形状",
