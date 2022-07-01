@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  	<DebugType>none</DebugType>
+  	<DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  
+  <ItemGroup>
+  	<None Remove="*.cfx" />
+  </ItemGroup>
+  
+  <ItemGroup>
+  	<EmbeddedResource Include="*.cfx" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Symirror4.Core\Symirror4.Core.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+  	<Reference Include="IndirectX">
+  	  <HintPath>..\libraries\IndirectX.dll</HintPath>
+  	</Reference>
+  	<Reference Include="IndirectX.D3D11">
+  	  <HintPath>..\libraries\IndirectX.D3D11.dll</HintPath>
+  	</Reference>
+  	<Reference Include="IndirectX.Dxgi">
+  	  <HintPath>..\libraries\IndirectX.Dxgi.dll</HintPath>
+  	</Reference>
+  	<Reference Include="IndirectX.EasyRenderer">
+  	  <HintPath>..\libraries\IndirectX.EasyRenderer.dll</HintPath>
+  	</Reference>
+  </ItemGroup>
+</Project>
