@@ -1,4 +1,4 @@
-﻿using Symirror3.Core.Numerics;
+using Symirror3.Core.Numerics;
 using System;
 using System.Numerics;
 

@@ -1,4 +1,4 @@
-﻿using IndirectX;
+using IndirectX;
 using Symirror3.Core.Polyhedrons;
 using Symirror3.Core.Symmetry;
 using System;

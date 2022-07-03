@@ -1,4 +1,4 @@
-﻿using Symirror3.Core;
+using Symirror3.Core;
 using Symirror3.Core.Polyhedrons;
 using Symirror3.Core.Symmetry;
 

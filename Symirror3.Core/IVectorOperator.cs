@@ -1,4 +1,4 @@
-﻿namespace Symirror3.Core;
+namespace Symirror3.Core;
 
 public interface IVectorOperator<T>
 {

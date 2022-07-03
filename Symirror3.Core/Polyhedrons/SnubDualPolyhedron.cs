@@ -1,4 +1,4 @@
-﻿using Symirror3.Core.Symmetry;
+using Symirror3.Core.Symmetry;
 using System;
 using System.Collections.Generic;
 using System.Linq;

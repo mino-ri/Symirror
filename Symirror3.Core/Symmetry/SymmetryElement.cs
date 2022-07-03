@@ -1,4 +1,4 @@
-﻿namespace Symirror3.Core.Symmetry;
+namespace Symirror3.Core.Symmetry;
 
 /// <summary>対称性を構成する要素を表します。</summary>
 public interface ISymmetryElement

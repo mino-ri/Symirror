@@ -1,4 +1,4 @@
-﻿namespace Symirror3.Core.Symmetry;
+namespace Symirror3.Core.Symmetry;
 
 public class SymmetryVertex : ISymmetryElement
 {

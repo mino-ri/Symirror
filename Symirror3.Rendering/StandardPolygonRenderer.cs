@@ -1,4 +1,4 @@
-﻿using Symirror3.Core.Polyhedrons;
+using Symirror3.Core.Polyhedrons;
 using System;
 using System.Collections.Generic;
 using System.Linq;

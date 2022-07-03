@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,8 +34,8 @@ public class SymmetryTriangle : ISymmetryElement, IReadOnlyList<SymmetryVertex>
         _vertices = new[] { vertex0, vertex1, vertex2 };
     }
 
-    private SymmetryTriangle((double x, double y, double z) vertex1, (double x, double y, double z) vertex2, (double x, double y , double z) vertex3)
-        : this (0, 0,
+    private SymmetryTriangle((double x, double y, double z) vertex1, (double x, double y, double z) vertex2, (double x, double y, double z) vertex3)
+        : this(0, 0,
         new SymmetryVertex(new SphericalPoint(vertex1.x, vertex1.y, vertex1.z), 0, 0),
         new SymmetryVertex(new SphericalPoint(vertex2.x, vertex2.y, vertex2.z), 1, 1),
         new SymmetryVertex(new SphericalPoint(vertex3.x, vertex3.y, vertex3.z), 2, 2))
@@ -215,7 +215,7 @@ public class SymmetryTriangle : ISymmetryElement, IReadOnlyList<SymmetryVertex>
             (new( 3  ,  5  , f5_4), new((g, 0, f), (0, -e, -d), (d, 0, e))),
             (new(f3_2,  5  ,  5  ), new((g, 0, f), (d, 0, e), (0, e, d))),
             (new(f3_2, f5_4, f5_4), new((g, 0, f), (0, -e, -d), (0, e, -d))),
-            
+
             (new( 3  ,  5  , f5_3), new((g, 0, f), (e, -d, 0), (d, 0, e))),
             (new( 3  , f5_4, f5_2), new((g, 0, f), (d, 0, -e), (0, e, -d))),
             (new(f3_2,  5  , f5_2), new((g, 0, f), (d, 0, -e), (0, e, d))),

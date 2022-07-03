@@ -1,9 +1,9 @@
-﻿using System;
+using IndirectX.EasyRenderer;
+using Symirror3.Core.Polyhedrons;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using IndirectX.EasyRenderer;
-using Symirror3.Core.Polyhedrons;
 
 namespace Symirror3.Rendering;
 

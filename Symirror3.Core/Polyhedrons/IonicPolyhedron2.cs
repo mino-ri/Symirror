@@ -1,4 +1,4 @@
-﻿using Symirror3.Core.Symmetry;
+using Symirror3.Core.Symmetry;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -100,8 +100,8 @@ public class IonicPolyhedron2<T> : SnubPolyhedron<T>
                 if (vertices.Any())
                     return new PolyhedronFace<T>(v, vertices);
 
-                    // 特別扱いしている頂点は、全採用 or 全不採用なので、不採用の場合はひとまわり外側の頂点を採用する
-                    var triangles = symmetry
+                // 特別扱いしている頂点は、全採用 or 全不採用なので、不採用の場合はひとまわり外側の頂点を採用する
+                var triangles = symmetry
                     .GetAround(v)
                     .ToArray();
 

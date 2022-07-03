@@ -1,4 +1,4 @@
-﻿using IndirectX;
+using IndirectX;
 using IndirectX.D3D11;
 using IndirectX.Dxgi;
 using IndirectX.EasyRenderer;

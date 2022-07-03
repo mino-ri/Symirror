@@ -1,4 +1,4 @@
-﻿using IndirectX;
+using IndirectX;
 using System.Numerics;
 using System.Runtime.InteropServices;
 

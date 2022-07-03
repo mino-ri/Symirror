@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using static System.Math;
 
 namespace Symirror3.Core.Numerics;

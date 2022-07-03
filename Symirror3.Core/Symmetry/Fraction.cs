@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Symirror3.Core.Symmetry;
 
