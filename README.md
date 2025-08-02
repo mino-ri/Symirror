@@ -1,7 +1,7 @@
 # Symirror
 ![symirror3: Wythoff construction visualizer](./docs/loho.png)
 
-[Download latest Symirror3 (1.1.0)](https://github.com/mino-ri/Symirror/releases/download/v1.1.0/Symirror3_1_1_0.zip)
+[Download latest Symirror3 (1.1.1)](https://github.com/mino-ri/Symirror/releases/download/v1.1.1/Symirror3_1_1_1.zip)
 
 ## What is Symirror?
 
