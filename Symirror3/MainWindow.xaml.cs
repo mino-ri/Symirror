@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -23,14 +24,14 @@ public partial class MainWindow : Window
         var dpi = VisualTreeHelper.GetDpi(MapImage);
         viewModel = new ViewModel(drawSuface, 256.0, dpi.DpiScaleX);
         DataContext = viewModel;
-        new MouseGestureHandler(null, DrawSuface_MouseDrag).Attach(drawSuface);
+        new MouseGestureHandler(null, DrawSurface_MouseDrag).Attach(drawSuface);
     }
 
     private void Window_Closing(object sender, CancelEventArgs e) => viewModel.Dispose();
 
     private void Window_Activated(object sender, EventArgs e) => viewModel?.Rotate(0f, 0f, 0f);
 
-    private void DrawSuface_MouseDrag(object sender, MouseGestureEventArgs e)
+    private void DrawSurface_MouseDrag(object sender, MouseGestureEventArgs e)
     {
         if (e.Button == MouseButton.Right)
         {

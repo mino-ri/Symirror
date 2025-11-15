@@ -1,7 +1,7 @@
 using IndirectX;
 using IndirectX.D3D11;
 using IndirectX.Dxgi;
-using IndirectX.EasyRenderer;
+using IndirectX.Helper;
 using System;
 using System.Linq;
 using System.Numerics;
@@ -17,7 +17,7 @@ internal sealed class Graphics : IDisposable
     private readonly int _width;
     private readonly int _height;
 
-    private readonly IndirectX.EasyRenderer.Graphics _graphics;
+    private readonly IndirectX.Helper.Graphics _graphics;
     private readonly ArrayBuffer<ushort> _indexBuffer;
     private readonly ArrayBuffer<Vertex> _vertexBuffer;
     private readonly ValueBuffer<TransformBuffer> _matrixBuffer;
@@ -44,14 +44,14 @@ internal sealed class Graphics : IDisposable
     {
         _width = width;
         _height = height;
-        _graphics = new IndirectX.EasyRenderer.Graphics(surfaceHandle, width, height, true, 60, 1, useStencil: true);
-        _vertexShader = _graphics.CompileVertexShader(GetResource("vs.cfx"));
-        _shadowMapVertexShader = _graphics.CompileVertexShader(GetResource("vs_shadow.cfx"));
-        _pixelShader = _graphics.CompilePixelShader(GetResource("ps.cfx"));
+        _graphics = new IndirectX.Helper.Graphics(surfaceHandle, width, height, true, 60, 1, useStencil: true);
+        _vertexShader = ShaderSource.LoadVertexShader(_graphics.Device);
+        _shadowMapVertexShader = ShaderSource.LoadShadowVertexShader(_graphics.Device);
+        _pixelShader = ShaderSource.LoadPixelShader(_graphics.Device);
 #if SHADOW_DEBUG
         _shadowMapPixelShader = _graphics.CompilePixelShader(GetResource("ps_shadow.cfx"));
 #endif
-        _graphics.SetInputLayout(GetResource("vsi.cfx"),
+        _graphics.SetInputLayout(ShaderSource.LoadInputLayout,
             new InputElementDesc { SemanticName = "POSITION", Format = Format.R32G32B32A32Float },
             new InputElementDesc { SemanticName = "COLOR", Format = Format.R32G32B32A32Float, AlignedByteOffset = 16 });
         _graphics.Context.VertexShader.Shader = _vertexShader;
@@ -288,7 +288,7 @@ internal sealed class Graphics : IDisposable
     public void ClearStencil() => _graphics.ClearStencil(0);
 
     public void Present() => _graphics.Present();
-
+    
     public void Dispose()
     {
         _ignoreStencilState.Dispose();
@@ -313,14 +313,5 @@ internal sealed class Graphics : IDisposable
         _fanIndices = Enumerable.Range(0, TriangleCount)
             .SelectMany(i => new[] { (ushort)0, (ushort)(i + 1), (ushort)(i + 2) })
             .ToArray();
-    }
-
-    private static byte[] GetResource(string name)
-    {
-        using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Symirror3.Rendering." + name);
-        if (stream is null) throw new ArgumentException("Invalid resource", nameof(name));
-        var buffer = new byte[stream.Length];
-        stream.Read(buffer.AsSpan());
-        return buffer;
     }
 }

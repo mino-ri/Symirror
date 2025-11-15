@@ -1,4 +1,4 @@
-using IndirectX.EasyRenderer;
+using IndirectX.Helper;
 using Symirror3.Core.Polyhedrons;
 using System;
 using System.Collections.Generic;
