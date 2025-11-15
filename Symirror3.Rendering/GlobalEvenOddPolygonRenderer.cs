@@ -26,7 +26,7 @@ internal class GlobalEvenOddPolygonRenderer : EvenOddPolygonRenderer
                 {
                     Normal = normal,
                     Distance = distance,
-                    Faces = new List<PolyhedronFace<Vector3>>(new[] { face }),
+                    Faces = new List<PolyhedronFace<Vector3>>([face]),
                 };
             })
             .ToArray();
@@ -193,20 +193,13 @@ internal class GlobalEvenOddPolygonRenderer : EvenOddPolygonRenderer
         if (polygon.Vertices.Length < 3)
             return default;
 
-        Vector3 normal;
-        if (polygon.Vertices.Length <= 4)
-        {
-            normal = Vector3.Normalize(Vector3.Cross(
+        var normal = polygon.Vertices.Length <= 4
+            ? Vector3.Normalize(Vector3.Cross(
                 polygon.Vertices[1].Vector - polygon.Vertices[0].Vector,
-                polygon.Vertices[2].Vector - polygon.Vertices[0].Vector));
-        }
-        else
-        {
-            normal = Vector3.Normalize(Vector3.Cross(
+                polygon.Vertices[2].Vector - polygon.Vertices[0].Vector))
+            : Vector3.Normalize(Vector3.Cross(
                 polygon.Vertices[2].Vector - polygon.Vertices[0].Vector,
                 polygon.Vertices[4].Vector - polygon.Vertices[0].Vector));
-        }
-
         if (Vector3Operator.ApproximatelyEqual(Vector3.Zero, normal, error))
             return default;
 

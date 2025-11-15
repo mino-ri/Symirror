@@ -23,8 +23,7 @@ public readonly struct Vector3D : IEquatable<Vector3D>
     public Vector3D Normalize()
     {
         var mag = Length;
-        if (mag == 0) return this;
-        return this / Length;
+        return mag == 0 ? this : this / Length;
     }
 
     /// <summary><see cref="Vector3D"/>構造体の新しいインスタンスを生成します。</summary>

@@ -2,9 +2,9 @@ using Symirror3.Core.Symmetry;
 
 namespace Symirror3.Core.Polyhedrons;
 
-public class PolyhedronSelector<T>
+public class PolyhedronSelector<T>(IVectorOperator<T> opr, SymmetrySymbol symbol)
 {
-    private readonly IVectorOperator<T> _opr;
+    private readonly IVectorOperator<T> _opr = opr;
 
     public SymmetrySymbol Symbol
     {
@@ -12,13 +12,7 @@ public class PolyhedronSelector<T>
         set => Symmetry = new SymmetryGroup(value);
     }
 
-    public SymmetryGroup Symmetry { get; private set; }
-
-    public PolyhedronSelector(IVectorOperator<T> opr, SymmetrySymbol symbol)
-    {
-        _opr = opr;
-        Symmetry = new SymmetryGroup(symbol);
-    }
+    public SymmetryGroup Symmetry { get; private set; } = new SymmetryGroup(symbol);
 
     public PolyhedronBase<T> GetPolyhedron(PolyhedronType polyhedronType)
     {

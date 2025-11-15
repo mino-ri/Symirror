@@ -31,7 +31,7 @@ public class SymmetryTriangle : ISymmetryElement, IReadOnlyList<SymmetryVertex>
     {
         ElementType = elementType;
         Index = index;
-        _vertices = new[] { vertex0, vertex1, vertex2 };
+        _vertices = [vertex0, vertex1, vertex2];
     }
 
     private SymmetryTriangle((double x, double y, double z) vertex1, (double x, double y, double z) vertex2, (double x, double y, double z) vertex3)

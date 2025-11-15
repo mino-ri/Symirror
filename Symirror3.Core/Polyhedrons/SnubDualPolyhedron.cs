@@ -5,10 +5,8 @@ using System.Linq;
 
 namespace Symirror3.Core.Polyhedrons;
 
-public class SnubDualPolyhedron<T> : WythoffianPolyhedron<T>
+public class SnubDualPolyhedron<T>(SymmetryGroup symmetry, IVectorOperator<T> opr) : WythoffianPolyhedron<T>(symmetry, opr)
 {
-    public SnubDualPolyhedron(SymmetryGroup symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
-
     protected override IEnumerable<PolyhedronVertex<T>> GetVertices(SymmetryGroup symmetry)
     {
         return symmetry.Faces
@@ -19,12 +17,12 @@ public class SnubDualPolyhedron<T> : WythoffianPolyhedron<T>
     protected override IEnumerable<PolyhedronFace<T>> GetFaces(SymmetryGroup symmetry)
     {
         var count = symmetry.Faces.Count;
-        return symmetry
+        return [.. symmetry
             .Faces
             .Where(f => f.ElementType == 1)
             .Select(f =>
             {
-                IEnumerable<PolyhedronVertex<T>> GetVerties()
+                IEnumerable<PolyhedronVertex<T>> GetVertices()
                 {
                     var fromFaces =
                         symmetry.GetNexts(f)
@@ -40,9 +38,8 @@ public class SnubDualPolyhedron<T> : WythoffianPolyhedron<T>
                     yield return fromFaces[2];
                 }
 
-                return new PolyhedronFace<T>(f, GetVerties());
-            })
-            .ToArray();
+                return new PolyhedronFace<T>(f, GetVertices());
+            })];
     }
 
     protected override void OnBasePointChanged(SphericalPoint value)
@@ -85,7 +82,7 @@ public class SnubDualPolyhedron<T> : WythoffianPolyhedron<T>
         var count = Symmetry.Faces.Count;
         for (var i = 1; i < count; i++)
         {
-            var copyDef = CopyDifinitions[i - 1];
+            var copyDef = CopyDefinitions[i - 1];
             var source = copyDef.Source;
             var edge = copyDef.ReverseEdge;
             Vertices[i].Vector = _opr.Reverse(Vertices[source].Vector, Symmetry[source].Edge(edge));

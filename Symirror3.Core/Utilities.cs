@@ -1,5 +1,4 @@
 using Symirror3.Core.Symmetry;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -50,13 +49,13 @@ public static class PolyhedronUtilities
         [new(2, 2, (7, 4))] = (0.674680300, 0.504504740, 0.538780570),
     };
 
-    private static readonly HashSet<SymmetrySymbol> DirhombicSymbols = new()
-    {
+    private static readonly HashSet<SymmetrySymbol> DirhombicSymbols =
+    [
         new(2, 3, (5, 2)),
         new(2, 3, (5, 3)),
         new(2, (3, 2), (5, 2)),
         new(2, (3, 2), (5, 3)),
-    };
+    ];
 
     public static bool TryGetSnubPoint(this SymmetrySymbol symbol, [NotNullWhen(true)] out SphericalPoint result)
     {

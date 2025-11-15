@@ -24,7 +24,7 @@ internal struct Line
             : new Line(p1.Y - p2.Y, p2.X - p1.X, p1.X * p2.Y - p2.X * p1.Y);
     }
 
-    public float SignedDistance(Vector3 point) => XFactor * point.X + YFactor * point.Y + Intercept;
+    public readonly float SignedDistance(Vector3 point) => XFactor * point.X + YFactor * point.Y + Intercept;
 
     private const float Error = 1f / 512f;
 

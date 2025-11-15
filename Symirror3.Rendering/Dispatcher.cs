@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Symirror3.Rendering;
@@ -19,7 +20,7 @@ public sealed class Dispatcher : IDisposable
     private readonly Graphics _graphics;
     private readonly LinkedList<IFrameTask> _frameTasks = new();
     private readonly ConcurrentQueue<IMessage> _messageQueue = new();
-    private readonly object _lockObj = new();
+    private readonly Lock _lockObj = new();
     private int _bufferFrames;
     private bool _stopRequested;
     private Task? _renderLoop;
@@ -29,7 +30,7 @@ public sealed class Dispatcher : IDisposable
     private PolyhedronBase<Vector3> _polyhedron;
     private PolygonRenderer _renderer;
     private readonly PolygonFilter _filter;
-    private int[] _colorIndices = new[] { 0, 1, 2, 3, 4 };
+    private int[] _colorIndices = [0, 1, 2, 3, 4];
 
     public SymmetryGroup Symmetry => _polyhedronSelector.Symmetry;
 

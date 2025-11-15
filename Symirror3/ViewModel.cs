@@ -20,8 +20,8 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
     private readonly System.Windows.Threading.Dispatcher _viewDispatcher;
     private readonly Dispatcher _dispatcher;
     private readonly GeneratorMap _generatorMap;
-    private static readonly Brush[] _brushes =
-    {
+    private static readonly SolidColorBrush[] _brushes =
+    [
         ColorBrush(0x804000),
         ColorBrush(0xFF4B0A),
         ColorBrush(0xFFD700),
@@ -32,9 +32,9 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
         ColorBrush(0xC316F0),
         ColorBrush(0xFFFFFF),
         ColorBrush(0xC8C8CB),
-    };
+    ];
 
-    private static Brush ColorBrush(uint value)
+    private static SolidColorBrush ColorBrush(uint value)
     {
         var brush = new SolidColorBrush(Color.FromRgb(
             (byte)(value >> 16),
@@ -45,30 +45,29 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
     }
 
     public UILanguage[] AllLanguages => UILanguage.Default;
-    private UILanguage _language = UILanguage.Default[0];
+
     public UILanguage Language
     {
-        get => _language;
-        set => SetValue(ref _language, value);
-    }
+        get;
+        set => SetValue(ref field, value);
+    } = UILanguage.Default[0];
 
     public SymmetrySymbol[] AllSymbols => SymmetryTriangle.AllSymbols;
 
-    private SymmetrySymbol _symbol = SymmetryTriangle.AllSymbols[12];
     public SymmetrySymbol Symbol
     {
-        get => _symbol;
+        get;
         set
         {
-            if (SetValue(ref _symbol, value))
+            if (SetValue(ref field, value))
             {
-                _dispatcher.SendMessage(new ChangeSymbol(_symbol, _polyhedronType.Value));
-                _generatorMap.UpdateImage(SymmetryTriangle.Create(_symbol), _polyhedronType.Value);
+                _dispatcher.SendMessage(new ChangeSymbol(field, _polyhedronType.Value));
+                _generatorMap.UpdateImage(SymmetryTriangle.Create(field), _polyhedronType.Value);
             }
         }
-    }
+    } = SymmetryTriangle.AllSymbols[12];
 
-    private readonly bool[] _faceVisibles = { true, true, true, true, true };
+    private readonly bool[] _faceVisibles = [true, true, true, true, true];
     public bool FaceVisible0
     {
         get => _faceVisibles[0];
@@ -99,7 +98,7 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
         set => SetValue(ref _faceVisibles[4], value, _ => new ChangeFaceVisible(_faceVisibles));
     }
 
-    private readonly int[] _colorIndices = new[] { 4, 2, 1, 5, 6 };
+    private readonly int[] _colorIndices = [4, 2, 1, 5, 6];
 
     public Brush FaceBrush0 => _brushes[_colorIndices[0]];
     public Brush FaceBrush1 => _brushes[_colorIndices[1]];
@@ -158,7 +157,7 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
             if (SetValue(ref _polyhedronType, value))
             {
                 _dispatcher.SendMessage(new ChangePolyhedronType(_polyhedronType.Value));
-                _generatorMap.UpdateImage(SymmetryTriangle.Create(_symbol), _polyhedronType.Value);
+                _generatorMap.UpdateImage(SymmetryTriangle.Create(Symbol), _polyhedronType.Value);
             }
         }
     }
@@ -178,30 +177,14 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
         get => _faceRenderType;
         set => SetValue(ref _faceRenderType, value, v => new ChangeFaceRenderType(v.Value));
     }
-
-    private bool _autoRotation;
-    public bool AutoRotation
-    {
-        get => _autoRotation;
-        set => SetValue(ref _autoRotation, value, v => new ChangeAutoRotation(v));
-    }
+    public bool AutoRotation { get; set => SetValue(ref field, value, v => new ChangeAutoRotation(v)); }
 
     public LightParameterViewModel[] LightParameters { get; }
-
-    private double _baseX;
-    public double BaseX { get => _baseX; private set => SetValue(ref _baseX, value); }
-
-    private double _baseY;
-    public double BaseY { get => _baseY; private set => SetValue(ref _baseY, value); }
-
-    private double _correctedX;
-    public double CorrectedX { get => _correctedX; private set => SetValue(ref _correctedX, value); }
-
-    private double _correctedY;
-    public double CorrectedY { get => _correctedY; private set => SetValue(ref _correctedY, value); }
-
-    private bool _showCorrectedPoint;
-    public bool ShowCorrectedPoint { get => _showCorrectedPoint; private set => SetValue(ref _showCorrectedPoint, value); }
+    public double BaseX { get; private set => SetValue(ref field, value); }
+    public double BaseY { get; private set => SetValue(ref field, value); }
+    public double CorrectedX { get; private set => SetValue(ref field, value); }
+    public double CorrectedY { get; private set => SetValue(ref field, value); }
+    public bool ShowCorrectedPoint { get; private set => SetValue(ref field, value); }
 
     public ImageSource GeneratorMap => _generatorMap.ImageSource;
 
@@ -283,16 +266,16 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
         ChangeColor9Command = new ActionCommand(ChangeColor9);
 
         _viewDispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
-        _generatorMap = new GeneratorMap(mapSize, dpiScale, SymmetryTriangle.Create(_symbol), _polyhedronType.Value);
+        _generatorMap = new GeneratorMap(mapSize, dpiScale, SymmetryTriangle.Create(Symbol), _polyhedronType.Value);
         _dispatcher = new Dispatcher(control.Handle, control.Width, control.Height, Symbol);
-        LightParameters = new[]
-        {
+        LightParameters =
+        [
             new LightParameterViewModel(LightParameter.AmbientLight, 15, this),
             new LightParameterViewModel(LightParameter.DiffuseLight, 90, this),
             new LightParameterViewModel(LightParameter.SpecularLight, 25, this),
             new LightParameterViewModel(LightParameter.SpecularLightSharpness, 20, this),
             new LightParameterViewModel(LightParameter.LightSourceDistance, 40, this),
-        };
+        ];
         _dispatcher.BasePointChanged += p => _viewDispatcher.Invoke(() =>
         {
             var vp = _generatorMap.ModelToDpi(p);

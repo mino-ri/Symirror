@@ -28,8 +28,8 @@ public abstract class PolyhedronBase<T>
         Symmetry = symmetry;
         _opr = opr;
         _basePoint = Symmetry[0][0].Point;
-        Vertices = GetVertices(symmetry).ToArray();
-        Faces = GetFaces(symmetry).ToArray();
+        Vertices = [.. GetVertices(symmetry)];
+        Faces = [.. GetFaces(symmetry)];
         OnBasePointChanged(_basePoint);
     }
 

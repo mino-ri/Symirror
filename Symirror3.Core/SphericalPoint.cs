@@ -107,7 +107,7 @@ public struct SphericalPoint : IEquatable<SphericalPoint>
 
     public static SphericalPoint operator +(in SphericalPoint a) => a;
 
-    public static SphericalPoint operator -(in SphericalPoint a) => new SphericalPoint(-a.X, -a.Y, -a.Z);
+    public static SphericalPoint operator -(in SphericalPoint a) => new(-a.X, -a.Y, -a.Z);
 
     public static Vector3D operator +(in SphericalPoint a, in SphericalPoint b) => new(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
 

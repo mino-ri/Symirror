@@ -9,8 +9,8 @@ namespace Symirror3.Rendering;
 
 public class PolygonFilter
 {
-    private readonly bool[] _faceVisibles = new bool[] { true, true, true, true, true };
-    private readonly bool[] _isShown = new bool[] { false, false, false, false, false };
+    private readonly bool[] _faceVisibles = [true, true, true, true, true];
+    private readonly bool[] _isShown = [false, false, false, false, false];
 
     private FaceViewType _faceViewType = FaceViewType.All;
     private Vector3 _targetVertex;

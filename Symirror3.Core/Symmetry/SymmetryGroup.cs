@@ -87,10 +87,10 @@ public class SymmetryGroup
         {
             var firstFace = SymmetryTriangle.Create(symbol);
             _symbol = symbol;
-            _faceCounts = _symbol.Select(s => s.Numerator * 2).ToArray();
-            _faces = new() { firstFace };
+            _faceCounts = [.. _symbol.Select(s => s.Numerator * 2)];
+            _faces = [firstFace];
             _faceIndex = 0;
-            _vertices = new();
+            _vertices = [];
 
             foreach (var v in firstFace)
                 _vertices[v] = 1;
@@ -107,7 +107,7 @@ public class SymmetryGroup
                 if (_faceIndex > 120) throw new ApplicationException("指定されたワイソフ記号から、球面を充填できませんでした。");
             }
 
-            return (_vertices.Keys.ToArray(), _faces.ToArray());
+            return ([.. _vertices.Keys], [.. _faces]);
         }
 
         // faces[targetIndex]の、reverseIndex を裏返して別の面を作る

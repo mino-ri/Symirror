@@ -3,7 +3,6 @@ using Symirror3.Core.Numerics;
 using Symirror3.Core.Polyhedrons;
 using Symirror3.Core.Symmetry;
 using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -73,8 +72,7 @@ public class GeneratorMap
 
         var stride = _bitmap.BackBufferStride / 4;
         var p = new Span<uint>(buffer.ToPointer(), _bitmap.PixelHeight * stride);
-        if (_polyhedronType == PolyhedronType.Snub ||
-            _polyhedronType == PolyhedronType.SnubDual)
+        if (_polyhedronType is PolyhedronType.Snub or PolyhedronType.SnubDual)
         {
             SphericalPoint mp, reversed0, reversed1, reversed2;
             double distance0, distance1, distance2;

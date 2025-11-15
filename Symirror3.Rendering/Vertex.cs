@@ -9,5 +9,5 @@ public struct Vertex
     public Vector3 Vector;
     public float Rhw;
 
-    public override string ToString() => $"({Vector.X}, {Vector.Y}, {Vector.Z})";
+    public override readonly string ToString() => $"({Vector.X}, {Vector.Y}, {Vector.Z})";
 }

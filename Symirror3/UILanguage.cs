@@ -9,7 +9,7 @@ public enum UIText
 {
     Symmetry,
     PolyhedronType,
-    FacesVisiblility,
+    FacesVisibility,
     LightSetting,
     AutoRotation,
     ResetRotation,
@@ -34,7 +34,7 @@ public class UILanguage
                 {
                     [UIText.Symmetry] = "Generator Source: ",
                     [UIText.PolyhedronType] = "Polyhedron Type: ",
-                    [UIText.FacesVisiblility] = "Faces Visibility",
+                    [UIText.FacesVisibility] = "Faces Visibility",
                     [UIText.LightSetting] = "Light Settings",
                     [UIText.AutoRotation] = "Auto Rotation",
                     [UIText.ResetRotation] = "Reset Rotation",
@@ -70,7 +70,7 @@ public class UILanguage
                 {
                     [UIText.Symmetry] = "球面三角形：",
                     [UIText.PolyhedronType] = "多面体の種類：",
-                    [UIText.FacesVisiblility] = "面の表示",
+                    [UIText.FacesVisibility] = "面の表示",
                     [UIText.LightSetting] = "光の設定",
                     [UIText.AutoRotation] = "自動回転",
                     [UIText.ResetRotation] = "回転リセット",

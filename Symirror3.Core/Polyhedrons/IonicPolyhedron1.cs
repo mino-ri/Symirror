@@ -5,10 +5,9 @@ using System.Linq;
 namespace Symirror3.Core.Polyhedrons;
 
 /// <summary>* 2p $ q $ 2r で表されるタイプの半オーダー多面体</summary>
-public class IonicPolyhedron1<T> : SnubPolyhedron<T>
+public class IonicPolyhedron1<T>(SymmetryGroup symmetry, IVectorOperator<T> opr)
+    : SnubPolyhedron<T>(symmetry, opr)
 {
-    public IonicPolyhedron1(SymmetryGroup symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
-
     protected override IEnumerable<PolyhedronFace<T>> GetFaces(SymmetryGroup symmetry)
     {
         // このタイプの半オーダー多面体が作れない場合
@@ -106,13 +105,13 @@ public class IonicPolyhedron1<T> : SnubPolyhedron<T>
                 continue;
 
             var pairAroundFaces = symmetry.GetNexts(pairFace).ToArray();
-            snubFaces.Add(new PolyhedronFace<T>(face.ElementType == 0 ? pairFace : face, new[]
-            {
+            snubFaces.Add(new PolyhedronFace<T>(face.ElementType == 0 ? pairFace : face,
+                [
                     Vertices[aroundFaces.First(x => face.GetUnsharedVertexIndex(x) == (chiralType + 1) % 3).Index],
                     Vertices[aroundFaces.First(x => face.GetUnsharedVertexIndex(x) == (chiralType + 2) % 3).Index],
                     Vertices[pairAroundFaces.First(x => pairFace.GetUnsharedVertexIndex(x) == (chiralType + 2) % 3).Index],
                     Vertices[pairAroundFaces.First(x => pairFace.GetUnsharedVertexIndex(x) == (chiralType + 1) % 3).Index],
-                }));
+                ]));
         }
 
         return rotationFaces.Concat(snubFaces);

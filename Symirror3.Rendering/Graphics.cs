@@ -5,7 +5,6 @@ using IndirectX.Helper;
 using System;
 using System.Linq;
 using System.Numerics;
-using System.Reflection;
 
 namespace Symirror3.Rendering;
 
@@ -187,7 +186,7 @@ internal sealed class Graphics : IDisposable
             AddressU = TextureAddressMode.Border,
             AddressV = TextureAddressMode.Border,
             AddressW = TextureAddressMode.Border,
-            BorderColor = new Float4(stackalloc float[4] { 1f, 1f, 1f, 1f }),
+            BorderColor = new Float4([1f, 1f, 1f, 1f]),
             ComparisonFunc = ComparisonFunc.LessEqual,
             Filter = Filter.ComparisonMinMagMipPoint,
             MaxAnisotropy = 0,
@@ -257,7 +256,7 @@ internal sealed class Graphics : IDisposable
             _graphics.Context.OutputMerger.SetRenderTarget(_graphics.RenderView, _shadowMapView);
 #else
         _graphics.Context.PixelShader.Shader = null;
-        _graphics.Context.OutputMerger.SetRenderTargets(Array.Empty<RenderTargetView>(), _shadowMapView);
+        _graphics.Context.OutputMerger.SetRenderTargets([], _shadowMapView);
 #endif
     }
 
@@ -307,11 +306,15 @@ internal sealed class Graphics : IDisposable
 
     static Graphics()
     {
-        _stripIndices = Enumerable.Range(0, TriangleCount)
-            .SelectMany(i => new[] { (ushort)i, (ushort)(i + 1), (ushort)(i + 2) })
-            .ToArray();
-        _fanIndices = Enumerable.Range(0, TriangleCount)
-            .SelectMany(i => new[] { (ushort)0, (ushort)(i + 1), (ushort)(i + 2) })
-            .ToArray();
+        _stripIndices =
+            [ .. Enumerable
+                .Range(0, TriangleCount)
+                .SelectMany(i => new[] { (ushort)i, (ushort)(i + 1), (ushort)(i + 2) })
+            ];
+        _fanIndices =
+            [.. Enumerable
+                .Range(0, TriangleCount)
+                .SelectMany(i => new[] { (ushort)0, (ushort)(i + 1), (ushort)(i + 2) })
+            ];
     }
 }

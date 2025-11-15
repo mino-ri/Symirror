@@ -4,10 +4,9 @@ using System.Linq;
 
 namespace Symirror3.Core.Polyhedrons;
 
-public class SnubPolyhedron<T> : WythoffianPolyhedron<T>
+public class SnubPolyhedron<T>(SymmetryGroup symmetry, IVectorOperator<T> opr)
+    : WythoffianPolyhedron<T>(symmetry, opr)
 {
-    public SnubPolyhedron(SymmetryGroup symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
-
     protected override IEnumerable<PolyhedronFace<T>> GetFaces(SymmetryGroup symmetry)
     {
         // 回転する面, ひとつの頂点のまわりを、ひとつ飛ばしで結ぶ

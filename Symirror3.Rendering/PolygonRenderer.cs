@@ -11,7 +11,7 @@ namespace Symirror3.Rendering;
 internal abstract class PolygonRenderer
 {
     private static readonly Color[] Colors =
-    {
+    [
         new Color(0xFF804000),
         new Color(0xFFFF4B0A),
         new Color(0xFFFFD700),
@@ -22,9 +22,9 @@ internal abstract class PolygonRenderer
         new Color(0xFFC316F0),
         new Color(0xFFFFFFFF),
         new Color(0xFFC8C8CB),
-    };
+    ];
 
-    private int[] ColorIndices = new int[] { 0, 1, 2, 3, 4 };
+    private int[] ColorIndices = [0, 1, 2, 3, 4];
 
     public virtual void Render(IEnumerable<PolyhedronFace<Vector3>> polyhedron, Graphics graphics)
     {
@@ -64,19 +64,13 @@ internal abstract class PolygonRenderer
     /// <param name="polygon">法線ベクトルを取得するポリゴン。</param>
     protected static Vector3 GetNormal(PolyhedronFace<Vector3> polygon, Graphics graphics)
     {
-        Vector3 normal;
-        if (polygon.Vertices.Length <= 4)
-        {
-            normal = Vector3.Normalize(graphics.World.Transform(Vector3.Cross(
+        var normal = polygon.Vertices.Length <= 4
+            ? Vector3.Normalize(graphics.World.Transform(Vector3.Cross(
                 polygon.Vertices[1].Vector - polygon.Vertices[0].Vector,
-                polygon.Vertices[2].Vector - polygon.Vertices[0].Vector)));
-        }
-        else
-        {
-            normal = Vector3.Normalize(graphics.World.Transform(Vector3.Cross(
+                polygon.Vertices[2].Vector - polygon.Vertices[0].Vector)))
+            : Vector3.Normalize(graphics.World.Transform(Vector3.Cross(
                 polygon.Vertices[2].Vector - polygon.Vertices[0].Vector,
                 polygon.Vertices[4].Vector - polygon.Vertices[0].Vector)));
-        }
 
         // 視線の向いている方向
         var sight = Vector3.Normalize(polygon.Vertices[0].Vector * graphics.World + new Vector3(0f, 0f, 5f));

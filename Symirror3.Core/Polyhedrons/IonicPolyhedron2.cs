@@ -4,10 +4,9 @@ using System.Linq;
 
 namespace Symirror3.Core.Polyhedrons;
 
-public class IonicPolyhedron2<T> : SnubPolyhedron<T>
+public class IonicPolyhedron2<T>(SymmetryGroup symmetry, IVectorOperator<T> opr)
+    : SnubPolyhedron<T>(symmetry, opr)
 {
-    public IonicPolyhedron2(SymmetryGroup symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
-
     protected override IEnumerable<PolyhedronFace<T>> GetFaces(SymmetryGroup symmetry)
     {
         // このタイプの半オーダー多面体が作れない場合
@@ -97,7 +96,7 @@ public class IonicPolyhedron2<T> : SnubPolyhedron<T>
                         .Select(f => Vertices[f.Index])
                         .ToArray();
 
-                if (vertices.Any())
+                if (vertices.Length != 0)
                     return new PolyhedronFace<T>(v, vertices);
 
                 // 特別扱いしている頂点は、全採用 or 全不採用なので、不採用の場合はひとまわり外側の頂点を採用する

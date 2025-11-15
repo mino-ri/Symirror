@@ -4,10 +4,9 @@ using System.Linq;
 
 namespace Symirror3.Core.Polyhedrons;
 
-public class DirhombicPolyhedron<T> : SnubPolyhedron<T>
+public class DirhombicPolyhedron<T>(SymmetryGroup symmetry, IVectorOperator<T> opr)
+    : SnubPolyhedron<T>(symmetry, opr)
 {
-    public DirhombicPolyhedron(SymmetryGroup symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
-
     protected override IEnumerable<PolyhedronFace<T>> GetFaces(SymmetryGroup symmetry)
     {
         if (symmetry.Symbol[0] != 2)

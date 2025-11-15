@@ -14,23 +14,23 @@ public struct QuaternionD : IEquatable<QuaternionD>
 
     public QuaternionD(in Vector3D vector, double w) => (X, Y, Z, W) = (vector.X, vector.Y, vector.Z, w);
 
-    public void Deconstruct(out double x, out double y, out double z, out double w) => (x, y, z, w) = (X, Y, Z, W);
+    public readonly void Deconstruct(out double x, out double y, out double z, out double w) => (x, y, z, w) = (X, Y, Z, W);
 
-    public static readonly QuaternionD Identity = new QuaternionD(0.0, 0.0, 0.0, 1.0);
+    public static readonly QuaternionD Identity = new(0.0, 0.0, 0.0, 1.0);
 
-    public double LengthSquared => X * X + Y * Y + Z * Z + W * W;
+    public readonly double LengthSquared => X * X + Y * Y + Z * Z + W * W;
 
-    public double Length => Sqrt(LengthSquared);
+    public readonly double Length => Sqrt(LengthSquared);
 
-    public QuaternionD Normalize()
+    public readonly QuaternionD Normalize()
     {
         var invNorm = 1.0 / Length;
         return new QuaternionD(X * invNorm, Y * invNorm, Z * invNorm, W * invNorm);
     }
 
-    public QuaternionD Conjugate => new QuaternionD(-X, -Y, -Z, W);
+    public readonly QuaternionD Conjugate => new(-X, -Y, -Z, W);
 
-    public QuaternionD Inverse()
+    public readonly QuaternionD Inverse()
     {
         var invNorm = 1.0f / LengthSquared;
         return new QuaternionD(-X * invNorm, -Y * invNorm, -Z * invNorm, W * invNorm);
@@ -65,15 +65,15 @@ public struct QuaternionD : IEquatable<QuaternionD>
     public static double Dot(in QuaternionD a, in QuaternionD b) =>
         a.X * b.X + a.Y * b.Y + a.Z * b.Z + a.W * b.W;
 
-    public bool Equals(QuaternionD other) => X == other.X && Y == other.Y && Z == other.Z && W == other.W;
+    public readonly bool Equals(QuaternionD other) => X == other.X && Y == other.Y && Z == other.Z && W == other.W;
 
-    public override bool Equals(object? obj) => obj is QuaternionD other && Equals(other);
+    public override readonly bool Equals(object? obj) => obj is QuaternionD other && Equals(other);
 
-    public override int GetHashCode() => (X, Y, Z, W).GetHashCode();
+    public override readonly int GetHashCode() => (X, Y, Z, W).GetHashCode();
 
-    public override string ToString() => $"[{X}, {Y}, {Z}, {W}]";
+    public override readonly string ToString() => $"[{X}, {Y}, {Z}, {W}]";
 
-    public Vector3D ToBasePoint()
+    public readonly Vector3D ToBasePoint()
     {
         return new Vector3D(
             2.0 * (X * Z + Y * W),
@@ -81,7 +81,7 @@ public struct QuaternionD : IEquatable<QuaternionD>
             Z * Z + W * W - X * X - Y * Y);
     }
 
-    public Vector3F ToBasePointF()
+    public readonly Vector3F ToBasePointF()
     {
         return new Vector3F(
             (float)(2.0 * (X * Z + Y * W)),
@@ -134,13 +134,13 @@ public struct QuaternionD : IEquatable<QuaternionD>
 
     public static QuaternionD operator +(in QuaternionD a) => a;
 
-    public static QuaternionD operator -(in QuaternionD a) => new QuaternionD(-a.X, -a.Y, -a.Z, -a.W);
+    public static QuaternionD operator -(in QuaternionD a) => new(-a.X, -a.Y, -a.Z, -a.W);
 
     public static QuaternionD operator +(in QuaternionD a, in QuaternionD b) =>
-        new QuaternionD(a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W);
+        new(a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W);
 
     public static QuaternionD operator -(in QuaternionD a, in QuaternionD b) =>
-        new QuaternionD(a.X - b.X, a.Y - b.Y, a.Z - b.Z, a.W - b.W);
+        new(a.X - b.X, a.Y - b.Y, a.Z - b.Z, a.W - b.W);
 
     public static QuaternionD operator *(in QuaternionD a, in QuaternionD b)
     {
@@ -152,10 +152,10 @@ public struct QuaternionD : IEquatable<QuaternionD>
     }
 
     public static QuaternionD operator *(in QuaternionD a, double f) =>
-        new QuaternionD(a.X * f, a.Y * f, a.Z * f, a.W * f);
+        new(a.X * f, a.Y * f, a.Z * f, a.W * f);
 
     public static QuaternionD operator /(in QuaternionD a, in QuaternionD b) => a * b.Inverse();
 
     public static QuaternionD operator /(in QuaternionD a, double f) =>
-        new QuaternionD(a.X / f, a.Y / f, a.Z / f, a.W / f);
+        new(a.X / f, a.Y / f, a.Z / f, a.W / f);
 }

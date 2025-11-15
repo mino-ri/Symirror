@@ -4,10 +4,9 @@ using System.Linq;
 
 namespace Symirror3.Core.Polyhedrons;
 
-public class NormalPolyhedron<T> : WythoffianPolyhedron<T>
+public class NormalPolyhedron<T>(SymmetryGroup symmetry, IVectorOperator<T> opr)
+    : WythoffianPolyhedron<T>(symmetry, opr)
 {
-    public NormalPolyhedron(SymmetryGroup symmetry, IVectorOperator<T> opr) : base(symmetry, opr) { }
-
     protected override IEnumerable<PolyhedronFace<T>> GetFaces(SymmetryGroup symmetry)
     {
         return symmetry.Vertices
