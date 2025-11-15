@@ -34,6 +34,10 @@ public record ChangeFaceRenderType(FaceRenderType FaceRenderType) : IMessage;
 
 public record ChangeColorIndices(int[] ColorIndices) : IMessage;
 
+public record TransitionSurfaceSize() : IMessage;
+
+public record ChangeSurfaceSize(int width, int height) : IMessage;
+
 public enum LightParameter
 {
     AmbientLight,

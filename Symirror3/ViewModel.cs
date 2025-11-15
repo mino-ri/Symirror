@@ -245,6 +245,11 @@ public sealed class ViewModel : INotifyPropertyChanged, IDisposable
     public ICommand ResetRotationCommand { get; }
     public void ResetRotation(object? _) => _dispatcher.SendMessage(new ResetRotation());
 
+    public void WindowSizeChanging() => _dispatcher.SendMessage(new TransitionSurfaceSize());
+
+    public void WindowSizeChanged(int width, int height) =>
+        _dispatcher.SendMessage(new ChangeSurfaceSize(width, height));
+
     public ViewModel(Win32Control control, double mapSize, double dpiScale)
     {
         AllPolyhedronTypes = GetEnums<PType>();

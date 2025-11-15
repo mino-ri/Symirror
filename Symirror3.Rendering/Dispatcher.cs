@@ -272,6 +272,16 @@ public sealed class Dispatcher : IDisposable
         _renderer.OnActivate(_graphics, _colorIndices);
     }
 
+    private void HandleMessageCore(ChangeSurfaceSize msg)
+    {
+        _graphics.Resize(msg.width, msg.height);
+    }
+
+    private void HandleMessageCore(TransitionSurfaceSize _)
+    {
+        // 何もしない
+    }
+
 #pragma warning disable CA1822 // メンバーを static に設定します
     private void HandleMessageCore(IMessage message)
 #pragma warning restore CA1822

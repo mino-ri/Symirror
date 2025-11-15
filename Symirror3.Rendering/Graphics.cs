@@ -5,6 +5,7 @@ using IndirectX.Helper;
 using System;
 using System.Linq;
 using System.Numerics;
+using System.Threading;
 
 namespace Symirror3.Rendering;
 
@@ -13,8 +14,9 @@ internal sealed class Graphics : IDisposable
     public const int TriangleCount = 28;
     private static readonly ushort[] _stripIndices;
     private static readonly ushort[] _fanIndices;
-    private readonly int _width;
-    private readonly int _height;
+    private int _width;
+    private int _height;
+    private float _lightDistance = 2f;
 
     private readonly IndirectX.Helper.Graphics _graphics;
     private readonly ArrayBuffer<ushort> _indexBuffer;
@@ -25,14 +27,14 @@ internal sealed class Graphics : IDisposable
     private readonly DepthStencilState _ignoreStencilState;
     private readonly DepthStencilState _stencilMaskState;
     private readonly DepthStencilState _writeStencilState;
-    private readonly DepthStencilView _shadowMapView;
+    private DepthStencilView _shadowMapView;
     private readonly VertexShader _vertexShader;
     private readonly VertexShader _shadowMapVertexShader;
     private readonly PixelShader _pixelShader;
 #if SHADOW_DEBUG
     private readonly PixelShader _shadowMapPixelShader;
 #endif
-    private readonly ShaderResourceView _shadowMapResourceView;
+    private ShaderResourceView _shadowMapResourceView;
 
     public ref Matrix4 World => ref _matrixBuffer.Value.World;
     public ref Matrix4 ViewProj => ref _matrixBuffer.Value.ViewProj;
@@ -43,7 +45,8 @@ internal sealed class Graphics : IDisposable
     {
         _width = width;
         _height = height;
-        _graphics = new IndirectX.Helper.Graphics(surfaceHandle, width, height, true, 60, 1, useStencil: true);
+        _lightDistance = 2f;
+        _graphics = new IndirectX.Helper.Graphics(surfaceHandle, _width, _height, true, 60, 1, useStencil: true);
         _vertexShader = ShaderSource.LoadVertexShader(_graphics.Device);
         _shadowMapVertexShader = ShaderSource.LoadShadowVertexShader(_graphics.Device);
         _pixelShader = ShaderSource.LoadPixelShader(_graphics.Device);
@@ -62,23 +65,14 @@ internal sealed class Graphics : IDisposable
         _materialBuffer = _graphics.RegisterConstantBuffer<MaterialBuffer>(1, ShaderStages.PixelShader);
         _lightBuffer = _graphics.RegisterConstantBuffer<LightBuffer>(2, ShaderStages.VertexShader | ShaderStages.PixelShader);
 
-        var size = Math.Min(width, height) * 0.4f;
-        ViewProj = Matrix4.Scaling(size, size, 1f, 1f) *
-                   Matrix4.LookAtLH(0f, 0f, 0f, 5f) *
-                   Matrix4.PerspectiveLH(5f, 3f, 7f, width, height);
-        World = Matrix4.Identity;
-        _matrixBuffer.Flush();
-
-        _materialBuffer.Value.NormalRhw = 1f;
-
         _lightBuffer.Value.AmbientFactor = 0.125f;
         _lightBuffer.Value.DiffuseFactor = 1f;
         _lightBuffer.Value.SpecularFactor = 0.25f;
         _lightBuffer.Value.SpecularIndex = 5f;
         _lightBuffer.Value.Sight = new Vector3(0f, 0f, -5f);
-        _lightBuffer.Value.ViewSize = Math.Min(width, height) / 2f;
-        SetLightDistance(2f);
-        _lightBuffer.Flush();
+
+        World = Matrix4.Identity;
+        SetSurfaceSize();
 
         _graphics.PrimitiveTopology = PrimitiveTopology.TriangleList;
         for (var i = 0; i < _vertexBuffer.Buffer.Length; i++)
@@ -158,28 +152,7 @@ internal sealed class Graphics : IDisposable
 
         _graphics.SetDepthStencilState(_ignoreStencilState, 0);
 
-        using var shadowMap = _graphics.Device.CreateTexture2D(new Texture2DDesc
-        {
-            Format = Format.R24G8Typeless,
-            ArraySize = 1,
-            MipLevels = 1,
-            Width = width,
-            Height = height,
-            SampleDesc = { Count = 1, Quality = 0 },
-            BindFlags = BindFlags.DepthStencil | BindFlags.ShaderResource,
-        });
-        _shadowMapView = _graphics.Device.CreateDepthStencilView(shadowMap, new DepthStencilViewDesc
-        {
-            Format = Format.D24UNormS8UInt,
-            ViewDimension = DsvDimension.Texture2D,
-            UnionPart0 = { Texture2D = { MipSlice = 0 } },
-        });
-        _shadowMapResourceView = _graphics.Device.CreateShaderResourceView(shadowMap, new ShaderResourceViewDesc
-        {
-            Format = Format.R24UNormX8Typeless,
-            ViewDimension = SrvDimension.Texture2D,
-            UnionPart0 = { Texture2D = { MipLevels = 1 } },
-        });
+        (_shadowMapView, _shadowMapResourceView) = CreateShadowMap();
 
         using var shadowMapSamplerState = _graphics.Device.CreateSamplerState(new SamplerDesc
         {
@@ -195,6 +168,51 @@ internal sealed class Graphics : IDisposable
             MaxLOD = 3.402823466E+38f,
         });
         _graphics.Context.PixelShader.SetSamplers(0, shadowMapSamplerState);
+    }
+
+    private void SetSurfaceSize()
+    {
+        var size = Math.Min(_width, _height) * 0.4f;
+        ViewProj = Matrix4.Scaling(size, size, 1f, 1f) *
+                   Matrix4.LookAtLH(0f, 0f, 0f, 5f) *
+                   Matrix4.PerspectiveLH(5f, 3f, 7f, _width, _height);
+        _matrixBuffer.Flush();
+
+        _materialBuffer.Value.NormalRhw = 1f;
+
+        _lightBuffer.Value.ViewSize = Math.Min(_width, _height) / 2f;
+        SetLightDistance(_lightDistance);
+        _lightBuffer.Flush();
+    }
+
+    private (DepthStencilView shadowMapView, ShaderResourceView shadowMapResourceView) CreateShadowMap()
+    {
+        using var shadowMap = _graphics.Device.CreateTexture2D(new Texture2DDesc
+        {
+            Format = Format.R24G8Typeless,
+            ArraySize = 1,
+            MipLevels = 1,
+            Width = _width,
+            Height = _height,
+            SampleDesc = { Count = 1, Quality = 0 },
+            BindFlags = BindFlags.DepthStencil | BindFlags.ShaderResource,
+        });
+
+        var shadowMapView = _graphics.Device.CreateDepthStencilView(shadowMap, new DepthStencilViewDesc
+        {
+            Format = Format.D24UNormS8UInt,
+            ViewDimension = DsvDimension.Texture2D,
+            UnionPart0 = { Texture2D = { MipSlice = 0 } },
+        });
+
+        var shadowMapResourceView = _graphics.Device.CreateShaderResourceView(shadowMap, new ShaderResourceViewDesc
+        {
+            Format = Format.R24UNormX8Typeless,
+            ViewDimension = SrvDimension.Texture2D,
+            UnionPart0 = { Texture2D = { MipLevels = 1 } },
+        });
+
+        return (shadowMapView, shadowMapResourceView);
     }
 
     public void FlushWorld() => _matrixBuffer.Flush();
@@ -218,6 +236,7 @@ internal sealed class Graphics : IDisposable
         Matrix4.RotationY(0.2f);
     public void SetLightDistance(float d)
     {
+        _lightDistance = d;
         LightBuffer.LightSource = _lightDirection * d;
         var size = Math.Min(_width, _height) * 0.5f;
         LightBuffer.LightViewProj =
@@ -287,7 +306,21 @@ internal sealed class Graphics : IDisposable
     public void ClearStencil() => _graphics.ClearStencil(0);
 
     public void Present() => _graphics.Present();
-    
+
+    public void Resize(int width, int height)
+    {
+        if (width == _width && height == _height)
+            return;
+
+        _width = width;
+        _height = height;
+        _graphics.Resize(width, height);
+        SetSurfaceSize();
+        var (shadowMapView, shadowMapResourceView) = CreateShadowMap();
+        Interlocked.Exchange(ref _shadowMapView, shadowMapView)?.Dispose();
+        Interlocked.Exchange(ref _shadowMapResourceView, shadowMapResourceView)?.Dispose();
+    }
+
     public void Dispose()
     {
         _ignoreStencilState.Dispose();

@@ -8,13 +8,15 @@
         UseLayoutRounding="True"
         SnapsToDevicePixels="True"
         SizeToContent="WidthAndHeight"
-        ResizeMode="CanMinimize"
+        ResizeMode="CanResize"
         Icon="icon.ico"
         Title="Symirror3"
         d:DataContext="{d:DesignData Type={x:Type local:ViewModel}}"
         ContentRendered="Window_ContentRendered"
         Closing="Window_Closing"
-        Activated="Window_Activated">
+        Activated="Window_Activated"
+        SizeChanged="Window_SizeChanged"
+        StateChanged="Window_StateChanged">
     <Window.Resources>
         <ContextMenu x:Key="ColorContextMenu" x:Shared="false"
                      DataContext="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
@@ -39,125 +41,150 @@
             <MenuItem Foreground="#C8C8CB" Header="■" Command="{Binding ChangeColor9Command}"
                       CommandParameter="{Binding Path=PlacementTarget.Tag, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
         </ContextMenu>
+        <local:MinimumConverter x:Key="MinimumConverter" />
     </Window.Resources>
-    <DockPanel Width="768" Height="512">
-        <WindowsFormsHost Width="512" Height="512" DockPanel.Dock="Left" Background="Black" Cursor="SizeAll"
-                          Focusable="False">
-            <local:DirectXHost Width="512" Height="512" x:Name="drawSuface" />
-        </WindowsFormsHost>
-        <Canvas DockPanel.Dock="Bottom" Width="256" Height="256" ClipToBounds="True" Cursor="Cross">
-            <Image Name="MapImage" Width="256" Height="256" Source="{Binding GeneratorMap}">
-                <local:MouseGestureHandler.AttachedHandler>
-                    <local:MouseGestureHandler MouseClick="MapImage_MouseClick"
-                                               MouseDrag="MapImage_MouseDrag" />
-                </local:MouseGestureHandler.AttachedHandler>
-            </Image>
-            <Ellipse Width="32" Height="32" Margin="-16"
-                     Canvas.Left="{Binding CorrectedX, Mode=OneWay}"
-                     Canvas.Top="{Binding CorrectedY, Mode=OneWay}"
-                     Fill="{x:Static Brushes.White}"
-                     IsHitTestVisible="False"
-                     SnapsToDevicePixels="False"
-                     UseLayoutRounding="False">
-                <Ellipse.Style>
-                    <Style TargetType="{x:Type Ellipse}">
-                        <Setter Property="Opacity" Value="0.5" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ShowCorrectedPoint, Mode=OneWay}" Value="True">
-                                <DataTrigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation From="0.5" To="0" Duration="00:00:00.5"
-                                                             Storyboard.TargetProperty="Opacity" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </DataTrigger.EnterActions>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Ellipse.Style>
-            </Ellipse>
-            <Ellipse Width="6" Height="6" Margin="-3"
-                     Canvas.Left="{Binding BaseX, Mode=OneWay}"
-                     Canvas.Top="{Binding BaseY, Mode=OneWay}"
-                     Fill="{x:Static Brushes.White}"
-                     Stroke="{x:Static Brushes.Black}"
-                     StrokeThickness="1"
-                     IsHitTestVisible="False"
-                     SnapsToDevicePixels="False"
-                     UseLayoutRounding="False" />
-        </Canvas>
-        <DockPanel DockPanel.Dock="Left" Width="124" Margin="4">
-            <TextBlock DockPanel.Dock="Top" Text="{Binding Path=Language.Texts[PolyhedronType],Mode=OneWay}" />
-            <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding AllPolyhedronTypes, Mode=OneTime}" SelectedValue="{Binding PolyhedronType}" DisplayMemberPath="ViewText" Margin="0,3" />
-            <TextBlock DockPanel.Dock="Top" Text="{Binding Path=Language.Texts[Symmetry],Mode=OneWay}" />
-            <ListBox ItemsSource="{Binding AllSymbols, Mode=OneTime}" SelectedValue="{Binding Symbol}" Margin="0,3,0,0" />
+    <DockPanel>
+        <DockPanel Width="256" Height="512"
+                   VerticalAlignment="Top"
+                   DockPanel.Dock="Right">
+            <Canvas DockPanel.Dock="Bottom" Width="256" Height="256" ClipToBounds="True" Cursor="Cross">
+                <Image Name="MapImage" Width="256" Height="256" Source="{Binding GeneratorMap}">
+                    <local:MouseGestureHandler.AttachedHandler>
+                        <local:MouseGestureHandler MouseClick="MapImage_MouseClick"
+                                                   MouseDrag="MapImage_MouseDrag" />
+                    </local:MouseGestureHandler.AttachedHandler>
+                </Image>
+                <Ellipse Width="32" Height="32" Margin="-16"
+                         Canvas.Left="{Binding CorrectedX, Mode=OneWay}"
+                         Canvas.Top="{Binding CorrectedY, Mode=OneWay}"
+                         Fill="{x:Static Brushes.White}"
+                         IsHitTestVisible="False"
+                         SnapsToDevicePixels="False"
+                         UseLayoutRounding="False">
+                    <Ellipse.Style>
+                        <Style TargetType="{x:Type Ellipse}">
+                            <Setter Property="Opacity" Value="0.5" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowCorrectedPoint, Mode=OneWay}" Value="True">
+                                    <DataTrigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation From="0.5" To="0" Duration="00:00:00.5"
+                                                                 Storyboard.TargetProperty="Opacity" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </DataTrigger.EnterActions>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Ellipse.Style>
+                </Ellipse>
+                <Ellipse Width="6" Height="6" Margin="-3"
+                         Canvas.Left="{Binding BaseX, Mode=OneWay}"
+                         Canvas.Top="{Binding BaseY, Mode=OneWay}"
+                         Fill="{x:Static Brushes.White}"
+                         Stroke="{x:Static Brushes.Black}"
+                         StrokeThickness="1"
+                         IsHitTestVisible="False"
+                         SnapsToDevicePixels="False"
+                         UseLayoutRounding="False" />
+            </Canvas>
+            <DockPanel DockPanel.Dock="Left" Width="124" Margin="4">
+                <TextBlock DockPanel.Dock="Top" Text="{Binding Path=Language.Texts[PolyhedronType],Mode=OneWay}" />
+                <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding AllPolyhedronTypes, Mode=OneTime}" SelectedValue="{Binding PolyhedronType}" DisplayMemberPath="ViewText" Margin="0,3" />
+                <TextBlock DockPanel.Dock="Top" Text="{Binding Path=Language.Texts[Symmetry],Mode=OneWay}" />
+                <ListBox ItemsSource="{Binding AllSymbols, Mode=OneTime}" SelectedValue="{Binding Symbol}" Margin="0,3,0,0" />
+            </DockPanel>
+            <StackPanel Orientation="Vertical" Margin="0,4,4,4">
+                <GroupBox Header="{Binding Path=Language.Texts[FacesVisibility],Mode=OneWay}" Margin="0">
+                    <StackPanel Orientation="Vertical">
+                        <Grid>
+                            <Grid.Resources>
+                                <Style TargetType="{x:Type CheckBox}">
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Height="22" Background="{Binding FaceBrush0}" CornerRadius="2" Margin="1">
+                                <CheckBox IsChecked="{Binding FaceVisible0}" Tag="0" ContextMenu="{StaticResource ColorContextMenu}" />
+                            </Border>
+                            <Border Height="22" Background="{Binding FaceBrush1}" CornerRadius="2" Margin="1" Grid.Column="1">
+                                <CheckBox IsChecked="{Binding FaceVisible1}" Tag="1" ContextMenu="{StaticResource ColorContextMenu}" />
+                            </Border>
+                            <Border Height="22" Background="{Binding FaceBrush2}" CornerRadius="2" Margin="1" Grid.Column="2">
+                                <CheckBox IsChecked="{Binding FaceVisible2}" Tag="2" ContextMenu="{StaticResource ColorContextMenu}" />
+                            </Border>
+                            <Border Height="22" Background="{Binding FaceBrush3}" CornerRadius="2" Margin="1" Grid.Column="3">
+                                <CheckBox IsChecked="{Binding FaceVisible3}" Tag="3" ContextMenu="{StaticResource ColorContextMenu}" />
+                            </Border>
+                            <Border Height="22" Background="{Binding FaceBrush4}" CornerRadius="2" Margin="1" Grid.Column="4">
+                                <CheckBox IsChecked="{Binding FaceVisible4}" Tag="4" ContextMenu="{StaticResource ColorContextMenu}" />
+                            </Border>
+                        </Grid>
+                        <ComboBox ItemsSource="{Binding AllFaceViewTypes,Mode=OneTime}" SelectedValue="{Binding FaceViewType}" DisplayMemberPath="ViewText" Margin="0,1" />
+                        <ComboBox ItemsSource="{Binding AllFaceRenderTypes,Mode=OneTime}" SelectedValue="{Binding FaceRenderType}" DisplayMemberPath="ViewText" Margin="0,1" />
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="{Binding Path=Language.Texts[LightSetting],Mode=OneWay}" Margin="0">
+                    <StackPanel Orientation="Vertical">
+                        <ComboBox ItemsSource="{Binding LightParameters, Mode=OneTime}"
+                                  DisplayMemberPath="ViewText"
+                                  SelectedIndex="0"
+                                  IsSynchronizedWithCurrentItem="True"
+                                  Margin="0,1" />
+                        <TextBlock>
+                            <Run Text="{Binding Path=LightParameters/ViewText,Mode=OneWay}"/>:
+                            <Run Text="{Binding Path=LightParameters/ParameterValue,Mode=OneWay}"/>
+                        </TextBlock>
+                        <Slider Minimum="0" Maximum="100" Value="{Binding Path=LightParameters/ParameterValue}"
+                                IsSnapToTickEnabled="True" TickFrequency="1" />
+                    </StackPanel>
+                </GroupBox>
+                <!--<TextBlock>
+                    <Run Text="{Binding Path=Language.Texts[LightFactor],Mode=OneWay}"/><Run Text="{Binding Light,Mode=OneWay}"/>
+                </TextBlock>
+                <Slider Minimum="0" Maximum="100" Value="{Binding Light}" IsSnapToTickEnabled="True" TickFrequency="1" />
+                <TextBlock>
+                    <Run Text="{Binding Path=Language.Texts[ShadowFactor],Mode=OneWay}"/><Run Text="{Binding Shadow,Mode=OneWay}"/>
+                </TextBlock>
+                <Slider Minimum="0" Maximum="100" Value="{Binding Shadow}" IsSnapToTickEnabled="True" TickFrequency="1" />-->
+                <CheckBox Content="{Binding Path=Language.Texts[AutoRotation],Mode=OneWay}" IsChecked="{Binding AutoRotation}" Margin="0,3,0,0"/>
+                <Button Content="{Binding Path=Language.Texts[ResetRotation],Mode=OneWay}" Command="{Binding ResetRotationCommand}" Margin="0,2,0,0" />
+                <ComboBox DockPanel.Dock="Bottom" Margin="0,2,0,0"
+                          ItemsSource="{Binding AllLanguages,Mode=OneTime}"
+                          SelectedItem="{Binding Language,Mode=TwoWay}" />
+            </StackPanel>
         </DockPanel>
-        <StackPanel Orientation="Vertical" Margin="0,4,4,4">
-            <GroupBox Header="{Binding Path=Language.Texts[FacesVisiblility],Mode=OneWay}" Margin="0">
-                <StackPanel Orientation="Vertical">
-                    <Grid>
-                        <Grid.Resources>
-                            <Style TargetType="{x:Type CheckBox}">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                <Setter Property="HorizontalAlignment" Value="Center"/>
-                            </Style>
-                        </Grid.Resources>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Border Height="22" Background="{Binding FaceBrush0}" CornerRadius="2" Margin="1">
-                            <CheckBox IsChecked="{Binding FaceVisible0}" Tag="0" ContextMenu="{StaticResource ColorContextMenu}" />
-                        </Border>
-                        <Border Height="22" Background="{Binding FaceBrush1}" CornerRadius="2" Margin="1" Grid.Column="1">
-                            <CheckBox IsChecked="{Binding FaceVisible1}" Tag="1" ContextMenu="{StaticResource ColorContextMenu}" />
-                        </Border>
-                        <Border Height="22" Background="{Binding FaceBrush2}" CornerRadius="2" Margin="1" Grid.Column="2">
-                            <CheckBox IsChecked="{Binding FaceVisible2}" Tag="2" ContextMenu="{StaticResource ColorContextMenu}" />
-                        </Border>
-                        <Border Height="22" Background="{Binding FaceBrush3}" CornerRadius="2" Margin="1" Grid.Column="3">
-                            <CheckBox IsChecked="{Binding FaceVisible3}" Tag="3" ContextMenu="{StaticResource ColorContextMenu}" />
-                        </Border>
-                        <Border Height="22" Background="{Binding FaceBrush4}" CornerRadius="2" Margin="1" Grid.Column="4">
-                            <CheckBox IsChecked="{Binding FaceVisible4}" Tag="4" ContextMenu="{StaticResource ColorContextMenu}" />
-                        </Border>
-                    </Grid>
-                    <ComboBox ItemsSource="{Binding AllFaceViewTypes,Mode=OneTime}" SelectedValue="{Binding FaceViewType}" DisplayMemberPath="ViewText" Margin="0,1" />
-                    <ComboBox ItemsSource="{Binding AllFaceRenderTypes,Mode=OneTime}" SelectedValue="{Binding FaceRenderType}" DisplayMemberPath="ViewText" Margin="0,1" />
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Header="{Binding Path=Language.Texts[LightSetting],Mode=OneWay}" Margin="0">
-                <StackPanel Orientation="Vertical">
-                    <ComboBox ItemsSource="{Binding LightParameters, Mode=OneTime}"
-                              DisplayMemberPath="ViewText"
-                              SelectedIndex="0"
-                              IsSynchronizedWithCurrentItem="True"
-                              Margin="0,1" />
-                    <TextBlock>
-                        <Run Text="{Binding Path=LightParameters/ViewText,Mode=OneWay}"/>:
-                        <Run Text="{Binding Path=LightParameters/ParameterValue,Mode=OneWay}"/>
-                    </TextBlock>
-                    <Slider Minimum="0" Maximum="100" Value="{Binding Path=LightParameters/ParameterValue}"
-                            IsSnapToTickEnabled="True" TickFrequency="1" />
-                </StackPanel>
-            </GroupBox>
-            <!--<TextBlock>
-                <Run Text="{Binding Path=Language.Texts[LightFactor],Mode=OneWay}"/><Run Text="{Binding Light,Mode=OneWay}"/>
-            </TextBlock>
-            <Slider Minimum="0" Maximum="100" Value="{Binding Light}" IsSnapToTickEnabled="True" TickFrequency="1" />
-            <TextBlock>
-                <Run Text="{Binding Path=Language.Texts[ShadowFactor],Mode=OneWay}"/><Run Text="{Binding Shadow,Mode=OneWay}"/>
-            </TextBlock>
-            <Slider Minimum="0" Maximum="100" Value="{Binding Shadow}" IsSnapToTickEnabled="True" TickFrequency="1" />-->
-            <CheckBox Content="{Binding Path=Language.Texts[AutoRotation],Mode=OneWay}" IsChecked="{Binding AutoRotation}" Margin="0,3,0,0"/>
-            <Button Content="{Binding Path=Language.Texts[ResetRotation],Mode=OneWay}" Command="{Binding ResetRotationCommand}" Margin="0,2,0,0" />
-            <ComboBox DockPanel.Dock="Bottom" Margin="0,2,0,0"
-                      ItemsSource="{Binding AllLanguages,Mode=OneTime}"
-                      SelectedItem="{Binding Language,Mode=TwoWay}" />
-        </StackPanel>
+        <ContentControl Name="SurfaceHost"
+                        Background="{x:Static Brushes.DarkCyan}"
+                        MinHeight="512"
+                        MinWidth="512"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        VerticalContentAlignment="Center"
+                        HorizontalContentAlignment="Center">
+            <WindowsFormsHost Background="{x:Static Brushes.Black}" Cursor="SizeAll" Focusable="False">
+                <WindowsFormsHost.Width>
+                    <MultiBinding Converter="{StaticResource MinimumConverter}">
+                        <Binding Path="ActualWidth" Mode="OneWay" ElementName="SurfaceHost" />
+                        <Binding Path="ActualHeight" Mode="OneWay" ElementName="SurfaceHost" />
+                    </MultiBinding>
+                </WindowsFormsHost.Width>
+                <WindowsFormsHost.Height>
+                    <MultiBinding Converter="{StaticResource MinimumConverter}">
+                        <Binding Path="ActualWidth" Mode="OneWay" ElementName="SurfaceHost" />
+                        <Binding Path="ActualHeight" Mode="OneWay" ElementName="SurfaceHost" />
+                    </MultiBinding>
+                </WindowsFormsHost.Height>
+                <local:DirectXHost Width="512" Height="512" x:Name="drawSurface" SizeChanged="drawSurface_SizeChanged" />
+            </WindowsFormsHost>
+        </ContentControl>
     </DockPanel>
 </Window>
